@@ -55,7 +55,7 @@ sub try_buff_polypotion_spellbook {
     # prefer blessed books since you're guaranteed to learn them
     my @books = uniq (
         TAEB->inventory->find(type => 'spellbook', is_blessed => 1),
-        TAEB->inventory->find(type => 'spellbook'),
+        TAEB->inventory->find(type => 'spellbook', is_cursed => 0),
     );
 
     for my $book (@books) {
@@ -80,7 +80,12 @@ sub try_buff_polypotion_spellbook {
 }
 
 sub try_reading_unknown_spellbook {
-    my @books = TAEB->inventory->find(type => 'spellbook', identity => undef);
+    my @books = TAEB->inventory->find(
+        type      => 'spellbook',
+        identity  => undef,
+        is_cursed => 0,
+    );
+
     for my $book (@books) {
         next if $book->difficult_for_level >= TAEB->level;
 
