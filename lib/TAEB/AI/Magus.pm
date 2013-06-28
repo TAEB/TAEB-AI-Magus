@@ -145,8 +145,10 @@ sub bolt {
 
     my $direction = TAEB->current_level->radiate(
         sub { shift->has_enemy },
-        stopper => sub { shift->has_friendly },
-        max     => $force_bolt->minimum_range,
+        max         => $force_bolt->minimum_range,
+
+        stopper     => sub { shift->has_friendly },
+        stopper_max => $force_bolt->maximum_range,
     );
     return unless $direction;
 
