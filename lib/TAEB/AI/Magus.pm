@@ -79,7 +79,7 @@ sub try_buff_polypotion_spellbook {
     return;
 }
 
-sub try_reading_unknown_spellbook {
+sub try_buff_reading_unknown_spellbook {
     my @books = TAEB->inventory->find(
         type      => 'spellbook',
         identity  => undef,
