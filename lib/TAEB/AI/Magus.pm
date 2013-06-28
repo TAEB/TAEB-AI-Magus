@@ -117,6 +117,17 @@ sub buff_enchant_weapon {
     );
 }
 
+sub buff_see_invisible {
+    my $potion = TAEB->inventory->find(
+        identity   => 'potion of see invisible',
+        is_blessed => 1,
+    ) or return;
+
+    return TAEB::Action::Quaff->new(
+        from => $potion,
+    );
+}
+
 sub pray {
     # This returns false if we prayed recently, or our god is angry, etc.
     return unless TAEB::Action::Pray->is_advisable;
