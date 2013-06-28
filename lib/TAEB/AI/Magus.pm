@@ -3,6 +3,7 @@ use Moose;
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
+use TAEB::Util 'first';
 
 has manager => (
     is      => 'ro',
@@ -18,7 +19,7 @@ sub next_action {
     my $self = shift;
 
     # Try each of these behaviors (which are methods) in order...
-    for my $behavior (qw/pray bolt melee hunt descend to_stairs open_door to_door explore search/) {
+    for my $behavior (qw/pray bolt melee hunt buff descend to_stairs open_door to_door explore search/) {
         my $method = "try_$behavior";
         my $action = $self->$method
             or next;
@@ -35,6 +36,15 @@ sub next_action {
     $self->currently('to_search');
     return $self->to_search;
 }
+
+sub try_buff {
+    my $self = shift;
+    return first { $self->$_ }
+           grep { /^try_buff_/ }
+           sort
+           __PACKAGE__->meta->get_all_method_names
+}
+
 
 sub try_pray {
     # This returns false if we prayed recently, or our god is angry, etc.
