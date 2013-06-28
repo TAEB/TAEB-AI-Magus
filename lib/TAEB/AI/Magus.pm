@@ -3,7 +3,7 @@ use Moose;
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
-use TAEB::Util 'first', 'uniq';
+use TAEB::Util 'uniq';
 
 has manager => (
     is      => 'ro',
@@ -39,10 +39,13 @@ sub next_action {
 
 sub try_buff {
     my $self = shift;
-    return first { $self->$_ }
-           grep { /^try_buff_/ }
-           sort
-           __PACKAGE__->meta->get_all_method_names
+
+    for my $method (grep { /^try_buff_/ } sort __PACKAGE__->meta->get_all_method_names) {
+        my $action = $self->$method;
+        return $action if $action;
+    }
+
+    return;
 }
 
 sub try_buff_polypotion_spellbook {
