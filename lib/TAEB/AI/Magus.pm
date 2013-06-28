@@ -54,7 +54,7 @@ sub try_bolt {
     my $direction = TAEB->current_level->radiate(
         sub { shift->has_enemy },
         stopper => sub { shift->has_friendly },
-        max     => 6, # XXX
+        max     => $force_bolt->minimum_range,
     );
     return unless $direction;
 
