@@ -1,6 +1,5 @@
 package TAEB::AI::Magus::Goal::EnterQuest;
 use Moose;
-use TAEB::Util 'any';
 extends 'TAEB::AI::Magus::Goal';
 
 # QuestExperience not actually needed to enter the quest portal

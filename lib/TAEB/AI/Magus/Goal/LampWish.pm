@@ -1,6 +1,5 @@
 package TAEB::AI::Magus::Goal::LampWish;
 use Moose;
-use TAEB::Util 'any';
 extends 'TAEB::AI::Magus::Goal';
 
 # XXX if we have an unknown lamp, either:

@@ -1,6 +1,5 @@
 package TAEB::AI::Magus::Goal::EnterMines;
 use Moose;
-use TAEB::Util 'any';
 extends 'TAEB::AI::Magus::Goal';
 
 sub met_when {
