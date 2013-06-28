@@ -3,7 +3,7 @@ use Moose;
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
-use TAEB::Util 'first';
+use TAEB::Util 'first', 'uniq';
 
 has manager => (
     is      => 'ro',
@@ -45,6 +45,36 @@ sub try_buff {
            __PACKAGE__->meta->get_all_method_names
 }
 
+sub try_buff_polypotion_spellbook {
+    my $polymorph = TAEB->inventory->find("potion of polymorph")
+        or return;
+
+    # prefer blessed books since you're guaranteed to learn them
+    my @books = uniq (
+        TAEB->inventory->find(type => 'spellbook', is_blessed => 1),
+        TAEB->inventory->find(type => 'spellbook'),
+    );
+
+    for my $book (@books) {
+        my $identity = $book->identity;
+
+        # don't polymorph unidentified spellbooks
+        next unless $identity;
+
+        # don't polymorph spellbooks we haven't learned yet
+        unless ($identity eq "spellbook of blank paper") {
+            my $spell_name = $book->spell;
+            next unless TAEB->spells->find($spell_name);
+        }
+
+        return TAEB::Action::Dip->new(
+            item => $book,
+            into => $polymorph,
+        );
+    }
+
+    return;
+}
 
 sub try_pray {
     # This returns false if we prayed recently, or our god is angry, etc.
