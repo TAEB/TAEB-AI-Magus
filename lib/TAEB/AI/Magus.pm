@@ -12,23 +12,40 @@ has manager => (
     handles => ['current_goal'],
 );
 
+my @behaviors = (qw/
+    pray
+    bolt
+    melee
+    hunt
+    buff_.*
+    descend
+    to_stairs
+    open_door
+    to_door
+    explore
+    search
+/);
+
 # The framework calls this method on the AI object to determine what action to
 # do next. An action is an instance of TAEB::Action, which is basically a handy
 # object wrapper around a NetHack command like "s" for search.
 sub next_action {
     my $self = shift;
 
+    my @methods = __PACKAGE__->meta->get_all_method_names;
+
     # Try each of these behaviors (which are methods) in order...
-    for my $behavior (qw/pray bolt melee hunt buff descend to_stairs open_door to_door explore search/) {
-        my $method = "try_$behavior";
-        my $action = $self->$method
-            or next;
+    for my $behavior (@behaviors) {
+        for my $method (grep { /^$behavior$/ } @methods) {
+            my $action = $self->$method
+                or next;
 
-        # "currently" is for reporting what we're doing on the second-to-last
-        # line of the TAEB display. Optional but you should set it anyway.
-        $self->currently($behavior);
+            # "currently" is for reporting what we're doing on the second-to-last
+            # line of the TAEB display. Optional but you should set it anyway.
+            $self->currently($behavior);
 
-        return $action;
+            return $action;
+        }
     }
 
     # We must be trapped! Search for a secret door. This is a nice fallback
@@ -37,18 +54,7 @@ sub next_action {
     return $self->to_search;
 }
 
-sub try_buff {
-    my $self = shift;
-
-    for my $method (grep { /^try_buff_/ } sort __PACKAGE__->meta->get_all_method_names) {
-        my $action = $self->$method;
-        return $action if $action;
-    }
-
-    return;
-}
-
-sub try_buff_polypotion_spellbook {
+sub buff_polypotion_spellbook {
     my $polymorph = TAEB->inventory->find("potion of polymorph")
         or return;
 
@@ -79,7 +85,7 @@ sub try_buff_polypotion_spellbook {
     return;
 }
 
-sub try_buff_reading_unknown_spellbook {
+sub buff_reading_unknown_spellbook {
     my @books = TAEB->inventory->find(
         type      => 'spellbook',
         identity  => undef,
@@ -96,7 +102,7 @@ sub try_buff_reading_unknown_spellbook {
     return;
 }
 
-sub try_buff_enchant_weapon {
+sub buff_enchant_weapon {
     my $scroll = TAEB->inventory->find(
         identity  => 'scroll of enchant weapon',
         is_cursed => 0,
@@ -111,7 +117,7 @@ sub try_buff_enchant_weapon {
     );
 }
 
-sub try_pray {
+sub pray {
     # This returns false if we prayed recently, or our god is angry, etc.
     return unless TAEB::Action::Pray->is_advisable;
 
@@ -122,7 +128,7 @@ sub try_pray {
     return TAEB::Action::Pray->new;
 }
 
-sub try_bolt {
+sub bolt {
     my $force_bolt = TAEB->find_castable("force bolt")
         or return;
 
@@ -140,7 +146,7 @@ sub try_bolt {
 }
 
 # Find an adjacent enemy and swing at it.
-sub try_melee {
+sub melee {
     if_adjacent(
         sub {
             my $tile = shift;
@@ -150,7 +156,7 @@ sub try_melee {
 }
 
 # Find an enemy on the level and hunt it down.
-sub try_hunt {
+sub hunt {
     path_to(sub {
         my $tile = shift;
 
@@ -161,20 +167,20 @@ sub try_hunt {
 }
 
 # If we're on stairs then descend.
-sub try_descend {
+sub descend {
     return unless TAEB->current_tile->type eq 'stairsdown';
 
     return TAEB::Action::Descend->new;
 }
 
 # If we see stairs, then go to them.
-sub try_to_stairs {
+sub to_stairs {
     path_to('stairsdown');
 }
 
 # If there's an adjacent closed door, try opening it. If it's locked, kick it
 # down.
-sub try_open_door {
+sub open_door {
     if_adjacent(closeddoor => sub {
         return 'kick' if shift->is_locked;
         return 'open';
@@ -182,17 +188,17 @@ sub try_open_door {
 }
 
 # If we see a closed door, then go to it.
-sub try_to_door {
+sub to_door {
     path_to('closeddoor', include_endpoints => 1);
 }
 
 # If there's an unexplored tile (tracked by the framework), go to it.
-sub try_explore {
+sub explore {
     path_to(sub { shift->unexplored });
 }
 
 # If there's an unsearched tile next to us, search.
-sub try_search {
+sub search {
     if_adjacent(
         sub { $_[0]->is_searchable && $_[0]->searched < 30 },
         'search',
