@@ -18,7 +18,7 @@ sub next_action {
     my $self = shift;
 
     # Try each of these behaviors (which are methods) in order...
-    for my $behavior (qw/pray melee hunt descend to_stairs open_door to_door explore search/) {
+    for my $behavior (qw/pray bolt melee hunt descend to_stairs open_door to_door explore search/) {
         my $method = "try_$behavior";
         my $action = $self->$method
             or next;
@@ -45,6 +45,23 @@ sub try_pray {
                || TAEB->in_pray_heal_range;
 
     return TAEB::Action::Pray->new;
+}
+
+sub try_bolt {
+    my $force_bolt = TAEB->find_castable("force bolt")
+        or return;
+
+    my $direction = TAEB->current_level->radiate(
+        sub { shift->has_enemy },
+        stopper => sub { shift->has_friendly },
+        max     => 6, # XXX
+    );
+    return unless $direction;
+
+    return TAEB::Action::Cast->new(
+        spell     => $force_bolt,
+        direction => $direction,
+    );
 }
 
 # Find an adjacent enemy and swing at it.
