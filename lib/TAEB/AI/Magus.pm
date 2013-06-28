@@ -96,6 +96,21 @@ sub try_buff_reading_unknown_spellbook {
     return;
 }
 
+sub try_buff_enchant_weapon {
+    my $scroll = TAEB->inventory->find(
+        identity  => 'scroll of enchant weapon',
+        is_cursed => 0,
+    ) or return;
+
+    my $weapon = TAEB->equipment->weapon or return;
+
+    return if ($weapon->numeric_enchantment||0) > 5;
+
+    return TAEB::Action::Read->new(
+        item => $scroll,
+    );
+}
+
 sub try_pray {
     # This returns false if we prayed recently, or our god is angry, etc.
     return unless TAEB::Action::Pray->is_advisable;
