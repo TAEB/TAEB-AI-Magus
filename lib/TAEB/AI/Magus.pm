@@ -2,6 +2,8 @@ package TAEB::AI::Magus;
 use Moose;
 extends 'TAEB::AI';
 
+use TAEB::AI::Magus::GoalManager;
+
 has manager => (
     is      => 'ro',
     isa     => 'TAEB::AI::Magus::GoalManager',

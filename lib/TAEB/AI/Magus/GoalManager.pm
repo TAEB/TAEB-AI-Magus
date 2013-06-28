@@ -42,6 +42,5 @@ sub goals {
 sub current_goal {
 }
 
-
 1;
 
