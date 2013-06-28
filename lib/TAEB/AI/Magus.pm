@@ -76,6 +76,18 @@ sub try_buff_polypotion_spellbook {
     return;
 }
 
+sub try_reading_unknown_spellbook {
+    my @books = TAEB->inventory->find(type => 'spellbook', identity => undef);
+    for my $book (@books) {
+        next if $book->difficult_for_level >= TAEB->level;
+
+        return TAEB::Action::Read->new(
+            item => $book,
+        );
+    }
+    return;
+}
+
 sub try_pray {
     # This returns false if we prayed recently, or our god is angry, etc.
     return unless TAEB::Action::Pray->is_advisable;
