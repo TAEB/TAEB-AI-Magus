@@ -143,6 +143,21 @@ sub buff_great_potion {
     );
 }
 
+sub buff_slow_digestion {
+    for my $ring (TAEB->left_hand, TAEB->right_hand) {
+        return if $ring
+               && $ring->identity
+               && $ring->identity eq 'ring of slow digestion';
+    }
+
+    my $ring = TAEB->inventory->find(
+        identity  => 'ring of slow digestion',
+        is_cursed => 0,
+    ) or return;
+
+    return TAEB::Action::Wear->new(item => $ring);
+}
+
 sub pray {
     return unless TAEB::Action::Pray->is_advisable;
 
