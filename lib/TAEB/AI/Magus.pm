@@ -37,7 +37,7 @@ sub next_action {
             my $action = $self->$method
                 or next;
 
-            $self->currently($behavior);
+            $self->currently($method);
 
             return $action;
         }
