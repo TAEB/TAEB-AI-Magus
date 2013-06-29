@@ -114,7 +114,7 @@ sub put_on_conflict {
     ) or return;
 
     # no way jose
-    return if has_adjacent_friendly;
+    return if has_adjacent_friendly();
 
     # only bother with conflict if there are multiple enemies
     return unless TAEB->current_level->has_enemies > 1;
@@ -128,7 +128,7 @@ sub take_off_conflict {
 
     # oh f*%$!! bail!
     return TAEB::Action::Remove->new(item => $ring)
-        if has_adjacent_friendly;
+        if has_adjacent_friendly();
 
     # there's still work to do...
     return if TAEB->current_level->has_enemies > 1;
