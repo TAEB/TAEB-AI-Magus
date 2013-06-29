@@ -1,6 +1,6 @@
 package TAEB::AI::Magus;
 use Moose;
-use TAEB::Util 'uniq';
+use TAEB::Util 'uniq', 'all';
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
