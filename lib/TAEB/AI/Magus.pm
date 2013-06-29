@@ -493,6 +493,7 @@ sub descend {
 
 sub eat_here {
     return if TAEB->nutrition > 995;
+    return if TAEB->current_tile->in_shop;
 
     for my $food (grep { $_->type eq 'food' } TAEB->current_tile->items) {
         next unless $food->is_safely_edible(distance => 0);
