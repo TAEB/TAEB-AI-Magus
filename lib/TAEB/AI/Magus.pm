@@ -37,6 +37,9 @@ my @behaviors = (qw/
 sub next_action {
     my $self = shift;
 
+    my $queued = $self->queue_manager->next_queued_action;
+    return $queued if $queued;
+
     my @methods = __PACKAGE__->meta->get_all_method_names;
 
     for my $behavior (@behaviors) {
@@ -45,6 +48,11 @@ sub next_action {
                 or next;
 
             $self->currently($method);
+
+            if (ref($action) eq 'ARRAY') {
+                $self->queue_manager->enqueue_actions(@$action);
+                return $self->queue_manager->next_queued_action;
+            }
 
             return $action;
         }
