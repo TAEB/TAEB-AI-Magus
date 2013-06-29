@@ -383,5 +383,11 @@ sub dip_bless {
     );
 }
 
+sub want_item {
+    my ($self, $item) = @_;
+
+    return $item->type eq 'spellbook';
+}
+
 1;
 
