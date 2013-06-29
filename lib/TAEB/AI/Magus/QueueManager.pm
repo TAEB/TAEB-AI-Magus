@@ -11,7 +11,7 @@ has magus => (
 
 has queued_actions => (
     traits  => ['Array'],
-    isa     => 'ArrayRef[TAEB::Action|HashRef]',
+    isa     => 'ArrayRef[TAEB::Action|CodeRef]',
     default => sub { [] },
     handles => {
         enqueue_actions    => 'push',
