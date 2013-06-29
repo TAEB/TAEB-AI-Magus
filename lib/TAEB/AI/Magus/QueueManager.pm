@@ -54,6 +54,9 @@ sub next_queued_action {
 
         TAEB->publisher->subscribe($wrapper);
         $self->register_temporary_subscription($wrapper);
+
+        # now we registered this subscriber, carry on to the next action
+        return $self->next_queued_action;
     }
     else {
         confess "$next is not a TAEB::Action or a coderef...?";
