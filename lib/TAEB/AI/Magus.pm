@@ -22,8 +22,9 @@ my @behaviors = (qw/
     pray
     put_on_conflict
     take_off_conflict
-    bolt
+    multi_bolt
     melee
+    single_bolt
     put_on_regen
     take_off_regen
     hunt
@@ -333,7 +334,31 @@ sub pray {
     return TAEB::Action::Pray->new;
 }
 
-sub bolt {
+sub multi_bolt {
+    my $force_bolt = TAEB->find_castable("force bolt")
+        or return;
+
+    my $seen_enemies;
+    my $direction = TAEB->current_level->radiate(
+        sub {
+            $seen_enemies++ if shift->has_enemy;
+            return $seen_enemies > 1;
+        },
+        max         => $force_bolt->minimum_range,
+
+        stopper     => sub { shift->has_friendly },
+        stopper_max => $force_bolt->maximum_range,
+
+        started_new_direction => sub { $seen_enemies = 0 },
+    );
+    return unless $direction;
+
+    return TAEB::Action::Cast->new(
+        spell     => $force_bolt,
+        direction => $direction,
+    );
+}
+sub single_bolt {
     my $force_bolt = TAEB->find_castable("force bolt")
         or return;
 
