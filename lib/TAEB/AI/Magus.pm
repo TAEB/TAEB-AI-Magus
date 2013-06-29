@@ -23,10 +23,12 @@ my @behaviors = (qw/
     put_on_conflict
     take_off_conflict
     multi_bolt
+    drop_scare_monster
     melee
     single_bolt
     put_on_regen
     take_off_regen
+    wait_scare_monster
     hunt
     eat_here
     to_item
@@ -85,6 +87,32 @@ sub put_on_regen {
                || TAEB->in_pray_heal_range;
 
     return TAEB::Action::Wear->new(item => $ring);
+}
+
+sub drop_scare_monster {
+    return; # XXX drop doesn't work well yet :(
+
+    return if TAEB->hp > TAEB->maxhp / 3;
+    return if TAEB->current_tile->find_item("scroll of scare monster");
+    return if !TAEB->current_level->has_enemies;
+
+    my $scroll = TAEB->inventory->find("scroll of scare monster")
+        or return;
+
+    return TAEB::Action::Drop->new(
+        items => [$scroll],
+    );
+}
+
+sub wait_scare_monster {
+    return unless TAEB->current_tile->find_item("scroll of scare monster");
+
+    if (TAEB->hp == TAEB->maxhp) {
+        return; # XXX pickup doesn't work :(
+    }
+
+    # wait til HP is back up
+    return TAEB::Action::Search->new;
 }
 
 sub take_off_regen {
