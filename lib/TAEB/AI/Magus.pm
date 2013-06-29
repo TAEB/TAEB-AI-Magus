@@ -25,6 +25,7 @@ my @behaviors = (qw/
     multi_bolt
     drop_scare_monster
     melee
+    cast_sleep
     single_bolt
     put_on_regen
     take_off_regen
@@ -386,6 +387,30 @@ sub multi_bolt {
 
     return TAEB::Action::Cast->new(
         spell     => $force_bolt,
+        direction => $direction,
+    );
+}
+
+sub cast_sleep {
+    my $self = shift;
+
+    my $spell = TAEB->find_castable("sleep")
+        or return;
+
+    my $direction = TAEB->current_level->radiate(
+        sub { shift->has_enemy },
+        max         => $spell->minimum_range,
+
+        stopper     => sub { shift->has_friendly },
+        stopper_max => $spell->maximum_range,
+
+        bouncy    => 1,
+        allowself => TAEB->senses->sleep_resistant,
+    );
+    return unless $direction;
+
+    return TAEB::Action::Cast->new(
+        spell     => $spell,
         direction => $direction,
     );
 }
