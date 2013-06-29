@@ -186,10 +186,10 @@ sub descend {
 sub eat_here {
     return if TAEB->nutrition > 995;
 
-    for my $item (grep { $_->type eq 'food' } TAEB->current_tile->items) {
-        next unless $item->is_safely_edible(distance => 0);
+    for my $food (grep { $_->type eq 'food' } TAEB->current_tile->items) {
+        next unless $food->is_safely_edible(distance => 0);
 
-        return TAEB::Action::Eat->new(item => $item);
+        return TAEB::Action::Eat->new(food => $food);
     }
 
     return;
