@@ -229,9 +229,7 @@ sub buff_great_potion {
 sub buff_slow_digestion {
     return if TAEB->equipment->left_ring
            && TAEB->equipment->right_ring;
-
-    return if TAEB->equipment->has_left_sd
-           || TAEB->equipment->has_right_sd;
+    return if TAEB->equipment->is_wearing_ring("ring of slow digestion");
 
     my $ring = TAEB->inventory->find(
         identity  => 'ring of slow digestion',
