@@ -93,6 +93,56 @@ sub buff_polypotion_spellbook {
     return;
 }
 
+sub buff_polypile_spellbook {
+    my $polymorph = TAEB->inventory->find(
+        identity => "wand of polymorph",
+        charges  => [ undef, sub { $_ > 0 } ],
+    ) or return;
+
+    # can't polypile if we're standing on items
+    return if TAEB->current_tile->items;
+
+    # prefer blessed books since you're guaranteed to learn them
+    my @books = uniq (
+        TAEB->inventory->find(type => 'spellbook', is_blessed => 1),
+        TAEB->inventory->find(type => 'spellbook', is_cursed => 0),
+    );
+
+    for my $book (@books) {
+        my $identity = $book->identity;
+
+        # don't polymorph unidentified spellbooks
+        next unless $identity;
+
+        # don't polymorph spellbooks we haven't learned yet
+        unless ($identity eq "spellbook of blank paper") {
+            my $spell_name = $book->spell;
+            next unless TAEB->spells->find($spell_name);
+        }
+
+        return [
+            TAEB::Action::Drop->new(
+                item => $book,
+            ),
+
+            TAEB::Action::Zap->new(
+                wand      => $polymorph,
+                direction => '>',
+            ),
+
+            sub {
+                my ($self, $name, $event) = @_;
+                return unless $name eq 'got_item';
+                $event->item->did_polymorph_from($book);
+            },
+
+            TAEB::Action::Pickup->new,
+        ];
+    }
+
+    return;
+}
+
 sub buff_reading_unknown_spellbook {
     my @books = TAEB->inventory->find(
         type      => 'spellbook',
