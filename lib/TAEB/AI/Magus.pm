@@ -118,10 +118,18 @@ sub buff_enchant_weapon {
     );
 }
 
-sub buff_see_invisible {
+sub buff_great_potion {
     my $potion = TAEB->inventory->find(
-        identity   => 'potion of see invisible',
+        identity   => [
+            'potion of see invisible',
+            'potion of gain ability',
+        ],
         is_blessed => 1,
+    ) || TAEB->inventory->find(
+        identity => [
+            'potion of gain ability',
+        ],
+        is_cursed => 0,
     ) or return;
 
     return TAEB::Action::Quaff->new(
