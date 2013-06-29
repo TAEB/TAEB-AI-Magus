@@ -344,7 +344,7 @@ sub multi_bolt {
             $seen_enemies++ if shift->has_enemy;
             return $seen_enemies > 1;
         },
-        max         => $force_bolt->minimum_range,
+        max         => $force_bolt->minimum_range + 1,
 
         stopper     => sub { shift->has_friendly },
         stopper_max => $force_bolt->maximum_range,
