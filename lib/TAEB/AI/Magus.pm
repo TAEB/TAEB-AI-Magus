@@ -1,6 +1,6 @@
 package TAEB::AI::Magus;
 use Moose;
-use TAEB::Util 'uniq', 'all';
+use TAEB::Util 'uniq', 'all', 'any';
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
@@ -412,7 +412,13 @@ sub melee {
     if_adjacent(
         sub {
             my $tile = shift;
-            $tile->has_enemy && $tile->monster->is_meleeable
+            return unless $tile->has_enemy;
+            return unless $tile->monster->is_meleeable;
+
+            # don't melee gas spores, bolt them from a distance
+            return if $tile->monster->has_possibility('gas spore');
+
+            return 1;
         } => 'melee',
     );
 }
