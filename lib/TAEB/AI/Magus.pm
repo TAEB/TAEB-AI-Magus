@@ -37,6 +37,7 @@ my @behaviors = (qw/
     pray
     put_on_conflict
     take_off_conflict
+    heal_self
     multi_bolt
     cast_sleep
     drop_scare_monster
@@ -381,6 +382,21 @@ sub pray {
     return TAEB::Action::Pray->new;
 }
 
+sub heal_self {
+    return if TAEB->hp * 2 > TAEB->maxhp;
+
+    my $spell = TAEB->find_castable("extra healing") || TAEB->find_castable("healing");
+    if ($spell) {
+        return TAEB::Action::Cast->new(
+            spell     => $spell,
+            direction => '.',
+        );
+    }
+
+    # XXX potion
+
+    return;
+}
 sub multi_bolt {
     my $force_bolt = TAEB->find_castable("force bolt")
         or return;
