@@ -106,7 +106,7 @@ sub buff_enchant_weapon {
 
     return if ($weapon->numeric_enchantment||0) > 5;
 
-    return TAEB::Action::Read->new(
+    return dip_bless($scroll) || TAEB::Action::Read->new(
         item => $scroll,
     );
 }
@@ -119,7 +119,7 @@ sub buff_enchant_armor {
 
     # XXX make sure our armor's lined up right...
 
-    return TAEB::Action::Read->new(
+    return dip_bless($scroll) || TAEB::Action::Read->new(
         item => $scroll,
     );
 }
@@ -138,7 +138,7 @@ sub buff_great_potion {
         is_cursed => 0,
     ) or return;
 
-    return TAEB::Action::Quaff->new(
+    return dip_bless($potion) || TAEB::Action::Quaff->new(
         from => $potion,
     );
 }
@@ -290,6 +290,21 @@ sub path_to {
     }
 
     return TAEB::World::Path->first_match($code, @_);
+}
+
+sub dip_bless {
+    my $item = shift;
+    return if $item->is_blessed;
+
+    my $holy_water = TAEB->inventory->find(
+        identity   => 'potion of water',
+        is_blessed => 1,
+    ) or return;
+
+    return TAEB::Action::Dip->new(
+        item => $item,
+        into => $holy_water,
+    );
 }
 
 1;
