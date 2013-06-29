@@ -389,6 +389,7 @@ sub multi_bolt {
         direction => $direction,
     );
 }
+
 sub single_bolt {
     my $force_bolt = TAEB->find_castable("force bolt")
         or return;
