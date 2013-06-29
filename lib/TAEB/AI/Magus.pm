@@ -1,15 +1,21 @@
 package TAEB::AI::Magus;
 use Moose;
+use TAEB::Util 'uniq';
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
-use TAEB::Util 'uniq';
+use TAEB::AI::Magus::QueueManager;
 
-has manager => (
+has goal_manager => (
     is      => 'ro',
     isa     => 'TAEB::AI::Magus::GoalManager',
     default => sub { TAEB::AI::Magus::GoalManager->new },
-    handles => ['current_goal'],
+);
+
+has queue_manager => (
+    is      => 'ro',
+    isa     => 'TAEB::AI::Magus::QueueManager',
+    default => sub { TAEB::AI::Magus::QueueManager->new(magus => shift) },
 );
 
 my @behaviors = (qw/
