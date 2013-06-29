@@ -18,14 +18,28 @@ has queue_manager => (
     default => sub { TAEB::AI::Magus::QueueManager->new(magus => shift) },
 );
 
+with (
+    'TAEB::AI::Role::Action::Backoff' => {
+        action        => 'TAEB::Action::Cast',
+        label         => 'sleep',
+        filter        => sub {
+            my ($self, $action) = @_;
+            return $action->spell->name eq 'sleep';
+        },
+        # just blackout for a few turns
+        blackout_when => sub { 1 },
+        clear_when => sub { 1 },
+    },
+);
+
 my @behaviors = (qw/
     pray
     put_on_conflict
     take_off_conflict
     multi_bolt
+    cast_sleep
     drop_scare_monster
     melee
-    cast_sleep
     single_bolt
     put_on_regen
     take_off_regen
@@ -396,6 +410,8 @@ sub cast_sleep {
 
     my $spell = TAEB->find_castable("sleep")
         or return;
+
+    return if $self->sleep_is_blacked_out;
 
     my $direction = TAEB->current_level->radiate(
         sub { shift->has_enemy },
