@@ -17,6 +17,7 @@ my @behaviors = (qw/
     bolt
     melee
     hunt
+    to_item
     buff_.*
     descend
     to_stairs
@@ -184,6 +185,11 @@ sub descend {
     return unless TAEB->current_tile->type eq 'stairsdown';
 
     return TAEB::Action::Descend->new;
+}
+
+sub to_item {
+    return unless TAEB->current_level->has_type('interesting');
+    path_to(sub { shift->is_interesting });
 }
 
 # If we see stairs, then go to them.
