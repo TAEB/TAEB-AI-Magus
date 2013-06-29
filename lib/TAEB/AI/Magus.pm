@@ -54,6 +54,7 @@ my @behaviors = (qw/
     open_door
     to_door
     explore
+    magic_map
     search
 /);
 
@@ -537,6 +538,19 @@ sub to_door {
 
 sub explore {
     path_to(sub { shift->unexplored });
+}
+
+sub magic_map {
+    return if TAEB->current_level->been_magic_mapped;
+
+    my $scroll = TAEB->inventory->find(
+        identity  => 'scroll of magic mapping',
+        is_cursed => 0,
+    ) or return;
+
+    return TAEB::Action::Read->new(
+        item => $scroll,
+    );
 }
 
 sub search {
