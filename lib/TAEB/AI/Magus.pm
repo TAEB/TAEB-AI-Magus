@@ -17,6 +17,7 @@ my @behaviors = (qw/
     bolt
     melee
     hunt
+    eat_here
     to_item
     buff_.*
     descend
@@ -180,6 +181,18 @@ sub descend {
     return unless TAEB->current_tile->type eq 'stairsdown';
 
     return TAEB::Action::Descend->new;
+}
+
+sub eat_here {
+    return if TAEB->nutrition > 995;
+
+    for my $item (grep { $_->type eq 'food' } TAEB->current_tile->items) {
+        next unless $item->is_safely_edible(distance => 0);
+
+        return TAEB::Action::Eat->new(item => $item);
+    }
+
+    return;
 }
 
 sub to_item {
