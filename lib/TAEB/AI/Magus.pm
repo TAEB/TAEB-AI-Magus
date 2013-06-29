@@ -20,19 +20,16 @@ has queue_manager => (
 
 with (
     'TAEB::AI::Role::Action::Backoff' => {
-        action        => 'TAEB::Action::Cast',
-        label         => 'sleep',
-        filter        => sub {
+        action       => 'TAEB::Action::Cast',
+        label        => 'sleep',
+        max_exponent => 3,
+        filter       => sub {
             my ($self, $action) = @_;
             return $action->spell->name eq 'sleep';
         },
         # just blackout for a few turns
         blackout_when => sub { 1 },
-        clear_when => sub {
-            my $self = shift;
-            $self->clear_sleep_blackout_exponent;
-            return 1;
-        },
+        clear_when => sub { 1 },
     },
 );
 
