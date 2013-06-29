@@ -78,7 +78,8 @@ sub put_on_regen {
         is_cursed => 0,
     ) or return;
 
-    return if !TAEB->current_level->has_enemies;
+    return unless TAEB->current_level->has_enemies
+               || TAEB->in_pray_heal_range;
 
     return TAEB::Action::Wear->new(item => $ring);
 }
@@ -275,8 +276,20 @@ sub buff_slow_digestion {
 sub pray {
     return unless TAEB::Action::Pray->is_advisable;
 
-    return unless TAEB->nutrition < 0
-               || TAEB->in_pray_heal_range;
+    if (TAEB->in_pray_heal_range) {
+        # don't pray if we're relatively safe and we have a ring of regeneration
+        return if !TAEB->current_level->has_enemies
+            && TAEB->inventory->find(
+                    identity  => 'ring of regeneration',
+                    is_cursed => 0,
+                );
+    }
+    elsif (TAEB->nutrition < 0) {
+        # always a good idea
+    }
+    else {
+        return;
+    }
 
     return TAEB::Action::Pray->new;
 }
