@@ -130,6 +130,9 @@ sub take_off_conflict {
     return TAEB::Action::Remove->new(item => $ring)
         if has_adjacent_friendly();
 
+    # no time to take off dis ring
+    return if has_adjacent_enemy();
+
     # there's still work to do...
     return if TAEB->current_level->has_enemies > 1;
 
@@ -525,6 +528,18 @@ sub has_adjacent_friendly {
         my ($tile) = @_;
         return unless $tile->has_monster;
         return if $tile->monster->is_enemy;
+        $ret = 1;
+    });
+
+    return $ret;
+}
+
+sub has_adjacent_enemy {
+    my $ret;
+    TAEB->each_adjacent(sub {
+        my ($tile) = @_;
+        return unless $tile->has_monster;
+        return if !$tile->monster->is_enemy;
         $ret = 1;
     });
 
