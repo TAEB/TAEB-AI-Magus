@@ -28,7 +28,11 @@ with (
         },
         # just blackout for a few turns
         blackout_when => sub { 1 },
-        clear_when => sub { 1 },
+        clear_when => sub {
+            my $self = shift;
+            $self->clear_sleep_blackout_exponent;
+            return 1;
+        },
     },
 );
 
