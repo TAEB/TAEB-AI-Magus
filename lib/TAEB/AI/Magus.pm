@@ -22,6 +22,8 @@ my @behaviors = (qw/
     pray
     bolt
     melee
+    put_on_regen
+    take_off_regen
     hunt
     eat_here
     to_item
@@ -60,6 +62,37 @@ sub next_action {
 
     $self->currently('to_search');
     return $self->to_search;
+}
+
+sub put_on_regen {
+    # regen speeds up hunger, and we're clearly starting to get desperate,
+    # so don't compound the situation
+    return if TAEB->nutrition < 100;
+
+    return if TAEB->equipment->left_ring
+           && TAEB->equipment->right_ring;
+    return if TAEB->equipment->is_wearing_ring("ring of regeneration");
+
+    my $ring = TAEB->inventory->find(
+        identity  => 'ring of regeneration',
+        is_cursed => 0,
+    ) or return;
+
+    return if !TAEB->current_level->has_enemies;
+
+    return TAEB::Action::Wear->new(item => $ring);
+}
+
+sub take_off_regen {
+    # no sense in taking off regen if we're not fully healed up!
+    return if TAEB->hp < TAEB->maxhp;
+
+    my $ring = TAEB->equipment->is_wearing_ring("ring of regeneration")
+        or return;
+
+    return if TAEB->current_level->has_enemies;
+
+    return TAEB::Action::Remove->new(item => $ring);
 }
 
 sub buff_polypotion_spellbook {
