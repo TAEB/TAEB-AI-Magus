@@ -144,11 +144,8 @@ sub buff_great_potion {
 }
 
 sub buff_slow_digestion {
-    for my $ring (TAEB->left_hand, TAEB->right_hand) {
-        return if $ring
-               && $ring->identity
-               && $ring->identity eq 'ring of slow digestion';
-    }
+    return if TAEB->equipment->has_left_sd
+           || TAEB->equipment->has_right_sd;
 
     my $ring = TAEB->inventory->find(
         identity  => 'ring of slow digestion',
