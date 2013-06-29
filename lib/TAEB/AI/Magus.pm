@@ -393,7 +393,12 @@ sub multi_bolt {
         },
         max         => $force_bolt->minimum_range + 1,
 
-        stopper     => sub { shift->has_friendly },
+        stopper     => sub {
+            my $self = shift;
+            return 1 if $self->has_friendly;
+            return 1 if $self->has_monster && $self->monster->is_nymph;
+            return 0;
+        },
         stopper_max => $force_bolt->maximum_range,
 
         started_new_direction => sub { $seen_enemies = 0 },
@@ -440,7 +445,12 @@ sub single_bolt {
         sub { shift->has_enemy },
         max         => $force_bolt->minimum_range,
 
-        stopper     => sub { shift->has_friendly },
+        stopper     => sub {
+            my $self = shift;
+            return 1 if $self->has_friendly;
+            return 1 if $self->has_monster && $self->monster->is_nymph;
+            return 0;
+        },
         stopper_max => $force_bolt->maximum_range,
     );
     return unless $direction;
