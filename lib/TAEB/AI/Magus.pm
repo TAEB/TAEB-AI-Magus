@@ -103,12 +103,14 @@ sub buff_polypile_spellbook {
     return if TAEB->current_tile->items;
 
     # prefer blessed books since you're guaranteed to learn them
-    my @books = uniq (
+    my @all_books = uniq (
         TAEB->inventory->find(type => 'spellbook', is_blessed => 1),
         TAEB->inventory->find(type => 'spellbook', is_cursed => 0),
     );
 
-    for my $book (@books) {
+    my @selected_books;
+
+    for my $book (@all_books) {
         my $identity = $book->identity;
 
         # don't polymorph unidentified spellbooks
@@ -120,27 +122,44 @@ sub buff_polypile_spellbook {
             next unless TAEB->spells->find($spell_name);
         }
 
-        return [
-            TAEB::Action::Drop->new(
-                item => $book,
-            ),
-
-            TAEB::Action::Zap->new(
-                wand      => $polymorph,
-                direction => '>',
-            ),
-
-            sub {
-                my ($self, $name, $event) = @_;
-                return unless $name eq 'got_item';
-                $event->item->did_polymorph_from($book);
-            },
-
-            TAEB::Action::Pickup->new,
-        ];
+        push @selected_books, $book;
     }
 
-    return;
+    return unless @selected_books;
+
+    my $all_blessed  = all { $_->is_blessed } @selected_books;
+    my $all_uncursed = all { $_->is_uncursed } @selected_books;
+
+    return [
+        TAEB::Action::Drop->new(
+            items => \@selected_books,
+        ),
+
+        TAEB::Action::Zap->new(
+            wand      => $polymorph,
+            direction => '>',
+        ),
+
+        sub {
+            my ($self, $name, $event) = @_;
+            return unless $name eq 'got_item';
+
+            my $item = $event->item;
+
+            if (@selected_books == 1) {
+                $item->did_polymorph_from($selected_books[0]);
+            }
+            else {
+                $item->did_polymorph;
+
+                $item->is_cursed(0);
+                $item->is_blessed(1) if $all_blessed;
+                $item->is_uncursed(1) if $all_uncursed;
+            }
+        },
+
+        TAEB::Action::Pickup->new,
+    ];
 }
 
 sub buff_reading_unknown_spellbook {
