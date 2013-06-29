@@ -20,6 +20,8 @@ has queue_manager => (
 
 my @behaviors = (qw/
     pray
+    put_on_conflict
+    take_off_conflict
     bolt
     melee
     put_on_regen
@@ -92,6 +94,43 @@ sub take_off_regen {
         or return;
 
     return if TAEB->current_level->has_enemies;
+
+    return TAEB::Action::Remove->new(item => $ring);
+}
+
+sub put_on_conflict {
+    # conflict speeds up hunger, and we're clearly starting to get desperate,
+    # so don't compound the situation
+    return if TAEB->nutrition < 100;
+
+    return if TAEB->equipment->left_ring
+           && TAEB->equipment->right_ring;
+    return if TAEB->equipment->is_wearing_ring("ring of conflict");
+
+    my $ring = TAEB->inventory->find(
+        identity  => 'ring of conflict',
+        is_cursed => 0,
+    ) or return;
+
+    # no way jose
+    return if has_adjacent_friendly;
+
+    # only bother with conflict if there are multiple enemies
+    return unless TAEB->current_level->has_enemies > 1;
+
+    return TAEB::Action::Wear->new(item => $ring);
+}
+
+sub take_off_conflict {
+    my $ring = TAEB->equipment->is_wearing_ring("ring of conflict")
+        or return;
+
+    # oh f*%$!! bail!
+    return TAEB::Action::Remove->new(item => $ring)
+        if has_adjacent_friendly;
+
+    # there's still work to do...
+    return if TAEB->current_level->has_enemies > 1;
 
     return TAEB::Action::Remove->new(item => $ring);
 }
@@ -453,6 +492,18 @@ sub want_item {
     my ($self, $item) = @_;
 
     return $item->type eq 'spellbook';
+}
+
+sub has_adjacent_friendly {
+    my $ret;
+    TAEB->each_adjacent(sub {
+        my ($tile) = @_;
+        return unless $tile->has_monster;
+        return unless $tile->monster->is_friendly;
+        $ret = 1;
+    });
+
+    return $ret;
 }
 
 1;
