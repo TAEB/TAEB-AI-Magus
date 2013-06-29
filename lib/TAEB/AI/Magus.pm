@@ -111,6 +111,19 @@ sub buff_enchant_weapon {
     );
 }
 
+sub buff_enchant_armor {
+    my $scroll = TAEB->inventory->find(
+        identity  => 'scroll of enchant armor',
+        is_cursed => 0,
+    ) or return;
+
+    # XXX make sure our armor's lined up right...
+
+    return TAEB::Action::Read->new(
+        item => $scroll,
+    );
+}
+
 sub buff_great_potion {
     my $potion = TAEB->inventory->find(
         identity   => [
