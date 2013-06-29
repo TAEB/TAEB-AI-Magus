@@ -524,7 +524,7 @@ sub has_adjacent_friendly {
     TAEB->each_adjacent(sub {
         my ($tile) = @_;
         return unless $tile->has_monster;
-        return unless $tile->monster->is_friendly;
+        return if $tile->monster->is_enemy;
         $ret = 1;
     });
 
