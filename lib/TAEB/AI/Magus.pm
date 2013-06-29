@@ -387,7 +387,10 @@ sub multi_bolt {
     my $seen_enemies;
     my $direction = TAEB->current_level->radiate(
         sub {
-            $seen_enemies++ if shift->has_enemy;
+            my $tile = shift;
+            if ($tile->has_enemy && $tile->monster->currently_seen) {
+                $seen_enemies++;
+            }
             return $seen_enemies > 1;
         },
         max         => $force_bolt->minimum_range + 1,
@@ -419,7 +422,11 @@ sub cast_sleep {
     return if $self->sleep_is_blacked_out;
 
     my $direction = TAEB->current_level->radiate(
-        sub { shift->has_enemy },
+        sub {
+            my $tile = shift;
+            return $tile->has_enemy
+                && $tile->monster->currently_seen;
+        },
         max         => $spell->minimum_range,
 
         stopper     => sub { shift->has_friendly },
@@ -441,7 +448,11 @@ sub single_bolt {
         or return;
 
     my $direction = TAEB->current_level->radiate(
-        sub { shift->has_enemy },
+        sub {
+            my $tile = shift;
+            return $tile->has_enemy
+                && $tile->monster->currently_seen;
+        },
         max         => $force_bolt->minimum_range,
 
         stopper     => sub {
