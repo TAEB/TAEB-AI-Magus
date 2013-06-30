@@ -32,8 +32,9 @@ has temporary_subscriptions => (
 );
 
 has currently => (
-    is  => 'rw',
-    isa => 'Str',
+    is      => 'rw',
+    isa     => 'Str',
+    clearer => 'clear_currently',
 );
 
 around currently => sub {
@@ -49,6 +50,7 @@ sub next_queued_action {
 
     if (!$self->has_queued_actions) {
         $self->clear_temporary_subscriptions;
+        $self->clear_currently;
         return;
     }
 
