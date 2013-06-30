@@ -54,6 +54,7 @@ my @behaviors = (qw/
     to_stairs
     open_door
     to_door
+    practice_spells
     explore
     magic_map
     search
@@ -550,6 +551,18 @@ sub open_door {
 
 sub to_door {
     path_to('closeddoor', include_endpoints => 1);
+}
+
+sub practice_spells {
+    return if TAEB->power < 20;
+    return if TAEB->power < TAEB->maxpower;
+    my $force_bolt = TAEB->find_castable("force bolt")
+        or return;
+
+    return TAEB::Action::Cast->new(
+        spell     => $force_bolt,
+        direction => '>',
+    );
 }
 
 sub explore {
