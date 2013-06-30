@@ -582,6 +582,9 @@ sub practice_spells {
     my $force_bolt = TAEB->find_castable("force bolt")
         or return;
 
+    # don't break the items on the ground
+    return if TAEB->current->tile->items;
+
     return TAEB::Action::Cast->new(
         spell     => $force_bolt,
         direction => '>',
