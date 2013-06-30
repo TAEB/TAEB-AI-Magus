@@ -402,9 +402,11 @@ sub heal_self {
 
     return;
 }
+
 sub multi_bolt {
-    my $force_bolt = TAEB->find_castable("force bolt")
+    my $spell = attack_spell()
         or return;
+    my $is_force_bolt = $spell->name eq 'force bolt';
 
     my $seen_enemies;
     my $direction = TAEB->current_level->radiate(
@@ -415,22 +417,30 @@ sub multi_bolt {
             }
             return $seen_enemies > 1;
         },
-        max         => $force_bolt->minimum_range + 1,
+        max         => $spell->minimum_range + 1,
+
+        # if we lost our MR we deserve to die ;)
+        allowself   => 1,
+        bouncy      => $spell->direction eq 'ray',
 
         stopper     => sub {
             my $self = shift;
             return 1 if $self->has_friendly;
-            return 1 if $self->has_monster && $self->monster->is_nymph;
+
+            if ($is_force_bolt) {
+                return 1 if $self->has_monster && $self->monster->is_nymph;
+            }
+
             return 0;
         },
-        stopper_max => $force_bolt->maximum_range,
+        stopper_max => $spell->maximum_range,
 
         started_new_direction => sub { $seen_enemies = 0 },
     );
     return unless $direction;
 
     return TAEB::Action::Cast->new(
-        spell     => $force_bolt,
+        spell     => $spell,
         direction => $direction,
     );
 }
@@ -466,8 +476,9 @@ sub cast_sleep {
 }
 
 sub single_bolt {
-    my $force_bolt = TAEB->find_castable("force bolt")
+    my $spell = attack_spell()
         or return;
+    my $is_force_bolt = $spell->name eq 'force bolt';
 
     my $direction = TAEB->current_level->radiate(
         sub {
@@ -475,20 +486,28 @@ sub single_bolt {
             return $tile->has_enemy
                 && $tile->monster->currently_seen;
         },
-        max         => $force_bolt->minimum_range,
+        max         => $spell->minimum_range,
+
+        # if we lost our MR we deserve to die ;)
+        allowself   => 1,
+        bouncy      => $spell->direction eq 'ray',
 
         stopper     => sub {
             my $self = shift;
             return 1 if $self->has_friendly;
-            return 1 if $self->has_monster && $self->monster->is_nymph;
+
+            if ($is_force_bolt) {
+                return 1 if $self->has_monster && $self->monster->is_nymph;
+            }
+
             return 0;
         },
-        stopper_max => $force_bolt->maximum_range,
+        stopper_max => $spell->maximum_range,
     );
     return unless $direction;
 
     return TAEB::Action::Cast->new(
-        spell     => $force_bolt,
+        spell     => $spell,
         direction => $direction,
     );
 }
@@ -689,6 +708,20 @@ sub has_adjacent_enemy {
     });
 
     return $ret;
+}
+
+sub attack_spell {
+    my $force_bolt = TAEB->find_castable("force bolt");
+    my $magic_missile = TAEB->find_castable("magic missile");
+
+    # magic missile doesn't beat force bolt til XL8
+    if ($force_bolt && $magic_missile) {
+        my ($fb_min, $fb_max) = $force_bolt->damage_range;
+        my ($mm_min, $mm_max) = $magic_missile->damage_range;
+        return $fb_max >= $mm_max ? $force_bolt : $magic_missile;
+    }
+
+    return $force_bolt || $magic_missile || undef;
 }
 
 1;
