@@ -31,6 +31,19 @@ has temporary_subscriptions => (
     },
 );
 
+has currently => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+around currently => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return $self->$orig(@_) if @_;
+    return $self->$orig . ' [queue]';
+};
+
 sub next_queued_action {
     my $self = shift;
 

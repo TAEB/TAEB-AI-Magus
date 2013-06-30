@@ -64,7 +64,10 @@ sub next_action {
     my $self = shift;
 
     my $queued = $self->queue_manager->next_queued_action;
-    return $queued if $queued;
+    if ($queued) {
+        $self->currently($self->queue_manager->currently);
+        return $queued;
+    }
 
     my @methods = __PACKAGE__->meta->get_all_method_names;
 
@@ -77,6 +80,7 @@ sub next_action {
 
             if (ref($action) eq 'ARRAY') {
                 $self->queue_manager->enqueue_actions(@$action);
+                $self->queue_manager->currently($method);
                 return $self->queue_manager->next_queued_action;
             }
 
