@@ -419,6 +419,8 @@ sub heal_self {
 }
 
 sub multi_bolt {
+    return unless TAEB->current_level->has_enemies;
+
     my $spell = attack_spell()
         or return;
     my $is_force_bolt = $spell->name eq 'force bolt';
@@ -468,6 +470,8 @@ sub cast_sleep {
 
     return if $self->sleep_is_blacked_out;
 
+    return unless TAEB->current_level->has_enemies;
+
     my $direction = TAEB->current_level->radiate(
         sub {
             my $tile = shift;
@@ -491,6 +495,8 @@ sub cast_sleep {
 }
 
 sub single_bolt {
+    return unless TAEB->current_level->has_enemies;
+
     my $spell = attack_spell()
         or return;
     my $is_force_bolt = $spell->name eq 'force bolt';
@@ -528,6 +534,8 @@ sub single_bolt {
 }
 
 sub melee {
+    return unless TAEB->current_level->has_enemies;
+
     if_adjacent(
         sub {
             my $tile = shift;
@@ -543,6 +551,8 @@ sub melee {
 }
 
 sub hunt {
+    return unless TAEB->current_level->has_enemies;
+
     path_to(sub {
         my $tile = shift;
 
