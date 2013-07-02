@@ -50,6 +50,7 @@ my @behaviors = (qw/
     eat_here
     to_item
     buff_.*
+    put_on_pois_res
     descend
     to_stairs
     open_door
@@ -108,6 +109,20 @@ sub put_on_regen {
 
     return unless TAEB->current_level->has_enemies
                || TAEB->in_pray_heal_range;
+
+    return TAEB::Action::Wear->new(item => $ring);
+}
+
+sub put_on_pois_res {
+    return if TAEB->senses->poison_resistant;
+    return if TAEB->equipment->left_ring
+           && TAEB->equipment->right_ring;
+    return if TAEB->equipment->is_wearing_ring("ring of poison resistance");
+
+    my $ring = TAEB->inventory->find(
+        identity  => 'ring of poison resistance',
+        is_cursed => 0,
+    ) or return;
 
     return TAEB::Action::Wear->new(item => $ring);
 }
