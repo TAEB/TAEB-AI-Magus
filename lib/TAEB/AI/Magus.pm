@@ -608,7 +608,7 @@ sub practice_spells {
         or return;
 
     # don't break the items on the ground
-    return if TAEB->current->tile->items;
+    return if TAEB->current_tile->items;
 
     return TAEB::Action::Cast->new(
         spell     => $force_bolt,
