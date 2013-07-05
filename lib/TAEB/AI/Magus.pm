@@ -781,7 +781,22 @@ sub practice_spells {
     return if TAEB->power < TAEB->maxpower;
 
     return $self->practice_nodir("haste self")
+        || $self->practice_nodir("identify")
         || $self->practice_nodir("remove curse")
+        || $self->practice_nodir("charm monster")
+        || $self->practice_nodir("protection")
+        || $self->practice_nodir("light")
+        || $self->practice_nodir("detect monsters")
+        || $self->practice_nodir("detect unseen")
+        || $self->practice_nodir("detect treasure")
+        || $self->practice_nodir("magic mapping")
+        || $self->practice_nodir("cure blindness")
+        || $self->practice_nodir("cure sickness")
+        || $self->practice_nodir("restore ability")
+        || $self->practice_nodir("detect food")
+        || $self->practice_nodir("clairvoyance")
+        || $self->practice_nodir("confuse monster")
+        || $self->practice_nodir("cause fear")
         || $self->practice_force_bolt;
 }
 
