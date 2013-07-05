@@ -541,9 +541,10 @@ sub wrest_wish {
 
 sub recharge_wishing {
     my $wand = TAEB->inventory->find(
-        identity  => "wand of wishing",
-        charges   => 0,
-        recharges => [ undef, 0 ],
+        identity        => "wand of wishing",
+        charges         => 0,
+        recharges       => [ undef, 0 ],
+        times_recharged => 0,
     ) or return;
 
     my $blessed_scroll = TAEB->inventory->find(
