@@ -1117,7 +1117,7 @@ sub would_sacrifice {
     return if !$corpse->should_sacrifice;
 
     if ($prospective) {
-        return if $corpse->age > 10;
+        return if $corpse->estimate_age > 25;
         # I have no idea what values of inventory are Burdened etc
         # depends on Str, so we should model that in TAEB
         # return if $corpse->weight + TAEB->inventory->weight > xxx;
