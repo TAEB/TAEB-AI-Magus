@@ -615,6 +615,8 @@ sub to_door {
 }
 
 sub practice_spells {
+    my $self = shift;
+
     return if TAEB->power < 20;
     return if TAEB->power < TAEB->maxpower;
 
