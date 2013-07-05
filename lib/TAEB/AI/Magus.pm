@@ -1381,6 +1381,8 @@ my @wishes = (
             my $item = shift;
             $item->is_blessed(1);
             $item->is_greased(1);
+            return unless $item->has_tracker;
+            $item->tracker->identify_as("speed boots");
         },
     },
 
@@ -1393,6 +1395,8 @@ my @wishes = (
             my $item = shift;
             $item->is_blessed(1);
             $item->is_greased(1);
+            return unless $item->has_tracker;
+            $item->tracker->identify_as("helm of brilliance");
         },
     },
 
@@ -1405,6 +1409,8 @@ my @wishes = (
             my $item = shift;
             $item->is_blessed(1);
             $item->is_greased(1);
+            return unless $item->has_tracker;
+            $item->tracker->identify_as("ring of conflict");
         },
     },
 
