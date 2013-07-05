@@ -52,7 +52,7 @@ my @behaviors = (qw/
     to_food
     eat_inventory
     eat_tile_food
-    to_item
+    to_interesting
     buff_.*
     put_on_pois_res
     descend
@@ -703,7 +703,7 @@ sub want_food {
     return 1;
 }
 
-sub to_item {
+sub to_interesting {
     return unless TAEB->current_level->has_type('interesting');
     path_to(sub { shift->is_interesting });
 }
