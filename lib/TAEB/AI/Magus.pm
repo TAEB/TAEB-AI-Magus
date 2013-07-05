@@ -1317,6 +1317,12 @@ my @wishes = (
             return "not a wand wish" unless $action->isa('TAEB::Action::Zap')
                                          || $action->isa('TAEB::Action::Engrave');
 
+            my $wand = $action->isa('TAEB::Action::Zap') ? $action->wand
+                                                         : $action->engraver;
+
+            return "already recharged wand"
+                if $wand->times_recharged;
+
             # don't bother if we already have a scroll of charging
             return "have b?oC" if TAEB->has_item(
                 identity => 'scroll of charging',
