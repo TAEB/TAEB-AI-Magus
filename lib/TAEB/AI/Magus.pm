@@ -891,7 +891,7 @@ sub hang_around_altar {
     my %is_offerable = map { refaddr $_ } @altars;
 
     return TAEB::Action::Search->new(iterations => 20)
-        if $is_offerable{refaddr TAEB->current_tile};
+        if $is_offerable{refaddr(TAEB->current_tile)};
 
     path_to(sub { $is_offerable{ refaddr shift } });
 }
