@@ -381,6 +381,22 @@ sub buff_slow_digestion {
     return TAEB::Action::Wear->new(item => $ring);
 }
 
+sub buff_enchant_ring {
+    return if TAEB->equipment->left_ring
+           && TAEB->equipment->right_ring;
+
+    my @rings = TAEB->inventory->find(type => 'ring', is_cursed => 0);
+    for my $ring (@rings) {
+        next if $ring->is_worn;
+        next unless $ring->enchantment_known;
+        next unless $ring->numeric_enchantment > 2;
+
+        return TAEB::Action::Wear->new(item => $ring);
+    }
+
+    return;
+}
+
 sub buff_haste_self {
     return if TAEB->senses->is_very_fast;
 
