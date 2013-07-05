@@ -1345,6 +1345,7 @@ my @wishes = (
         identify => sub {
             my $item = shift;
             $item->is_blessed(1);
+            return unless $item->has_tracker; # has it already been IDed?
             $item->tracker->identify_as('scroll of charging');
         },
     },
@@ -1448,6 +1449,9 @@ subscribe got_item => sub {
         for (my $i = 0; $i < @wishes; $i += 2) {
             my ($wish, $handlers) = @wishes[$i, $i+1];
             next unless $wish eq $last_wish;
+
+            TAEB->log->ai("Identifying $item using the $wish handler");
+
             $handlers->{identify}->($item);
             return;
         }
