@@ -43,6 +43,8 @@ with (
 our @behaviors = (qw/
     pray
 
+    wish
+
     put_on_conflict
     take_off_conflict
     heal_self
@@ -509,6 +511,17 @@ sub pray {
     }
 
     return TAEB::Action::Pray->new;
+}
+
+sub wish {
+    my $wand = TAEB->inventory->find(
+        identity => "wand of wishing",
+        charges  => [ undef, sub { $_ > 0 } ],
+    ) or return;
+
+    return TAEB::Action::Zap->new(
+        wand => $wand,
+    );
 }
 
 sub heal_self {
