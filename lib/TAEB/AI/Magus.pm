@@ -1111,7 +1111,7 @@ sub would_sacrifice {
     my $corpse = shift;
     my $prospective = shift;
 
-    return unless $corpse->subtype eq 'corpse';
+    return unless $corpse->match(subtype => 'corpse');
 
     return if $self->want_food($corpse);
     return if $corpse->failed_to_sacrifice;
