@@ -953,7 +953,7 @@ sub to_altar {
     my $self = shift;
     my @altars = $self->offerable_altars
         or return;
-    my %is_offerable = map { refaddr $_ } @altars;
+    my %is_offerable = map { (refaddr $_) => 1 } @altars;
 
     return unless any { $self->would_sacrifice($_) }
                   TAEB->inventory->find(subtype => 'corpse');
