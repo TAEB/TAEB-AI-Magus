@@ -565,7 +565,7 @@ sub recharge_wishing {
         is_uncursed => 1,
     );
 
-    my $dip = dip_bless($uncursed_scroll);
+    my $dip = $uncursed_scroll && dip_bless($uncursed_scroll);
     return $dip if $dip;
 
 
@@ -574,7 +574,7 @@ sub recharge_wishing {
         buc      => undef,
     );
 
-    $dip = dip_bless($unknown_scroll);
+    $dip = $unknown_scroll && dip_bless($unknown_scroll);
     return $dip if $dip;
 
 
@@ -583,7 +583,7 @@ sub recharge_wishing {
         is_cursed => 1,
     );
 
-    $dip = dip_bless($cursed_scroll);
+    $dip = $cursed_scroll && dip_bless($cursed_scroll);
     return $dip if $dip;
 
     return;
