@@ -839,8 +839,12 @@ sub to_door {
 }
 
 sub oracle_statues {
+    my $self = shift;
+
     return unless TAEB->current_level->is_oracle;
     return unless any { $_->type eq 'statue' } TAEB->current_level->items;
+
+    my $spell = TAEB->find_spell("force bolt");
 
     my $direction;
     if (any { $_->type eq 'statue' } TAEB->current_tile->items) {
@@ -866,8 +870,7 @@ sub oracle_statues {
     }
 
     # restore Pw if needed
-    my $spell = TAEB->find_castable("force bolt");
-    if (!$spell) {
+    if (!$spell->castable) {
         return TAEB::Action::Search->new(iterations => 20);
     }
 
