@@ -1311,20 +1311,20 @@ sub stay_on_level {
 
 my @wishes = (
     '2 blessed scrolls of charging' => {
-        predicate => sub {
+        avoid => sub {
             # only wish for b?oC if we used a wand to get this wish
             my $action = TAEB->action;
-            return 0 unless $action->isa('TAEB::Action::Zap')
-                         || $action->isa('TAEB::Action::Engrave');
+            return "not a wand wish" unless $action->isa('TAEB::Action::Zap')
+                                         || $action->isa('TAEB::Action::Engrave');
 
             # don't bother if we already have a scroll of charging
-            return 0 if TAEB->has_item(
+            return "have b?oC" if TAEB->has_item(
                 identity => 'scroll of charging',
                 is_blessed => 1,
             );
 
             # don't bother if we have charging and can bless it
-            return 0 if TAEB->has_item(
+            return "have uc?oC and !oHW" if TAEB->has_item(
                 identity    => 'scroll of charging',
                 is_uncursed => 1,
             ) && TAEB->has_item(
@@ -1333,7 +1333,8 @@ my @wishes = (
             );
 
             # XXX if our charging is cursed (or unknown) and we have 2 holy water, still don't need to wish for it, but that'll probably be rare
-            return 1;
+
+            return;
         },
         identify => sub {
             my $item = shift;
@@ -1342,10 +1343,10 @@ my @wishes = (
         },
     },
     'blessed fixed greased Master Key of Thievery' => {
-        predicate => sub {
-            return 0 if TAEB->hp <= 20; # artifact blast
-            return 0 if TAEB->seen_artifact('Master Key of Thievery');
-            return 1;
+        avoid => sub {
+            return "would die from artifact blast" if TAEB->hp <= 20;
+            return "already seen MKoT" if TAEB->seen_artifact('Master Key of Thievery');
+            return;
         },
         identify => sub {
             my $item = shift;
@@ -1354,9 +1355,9 @@ my @wishes = (
         },
     },
     'blessed fixed greased +3 silver dragon scale mail' => {
-        predicate => sub {
-            return 0 if TAEB->has_item(/dragon scale mail/);
-            return 1;
+        avoid => sub {
+            return "have DSM" if TAEB->has_item(/dragon scale mail/);
+            return;
         },
         identify => sub {
             my $item = shift;
@@ -1365,9 +1366,9 @@ my @wishes = (
         },
     },
     'blessed fixed greased +3 speed boots' => {
-        predicate => sub {
-            return 0 if TAEB->has_item(/speed boots/);
-            return 1;
+        avoid => sub {
+            return "have speed boots" if TAEB->has_item(/speed boots/);
+            return;
         },
         identify => sub {
             my $item = shift;
@@ -1377,9 +1378,9 @@ my @wishes = (
     },
 
     'blessed fixed greased +3 helm of brilliance' => {
-        predicate => sub {
-            return 0 if TAEB->has_item(/helm of brilliance/);
-            return 1;
+        avoid => sub {
+            return "have helm of brilliance" if TAEB->has_item(/helm of brilliance/);
+            return;
         },
         identify => sub {
             my $item = shift;
@@ -1389,9 +1390,9 @@ my @wishes = (
     },
 
     'blessed fixed greased ring of conflict' => {
-        predicate => sub {
-            return 0 if TAEB->has_item(/ring of conflict/);
-            return 1;
+        avoid => sub {
+            return "have ring of conflict" if TAEB->has_item(/ring of conflict/);
+            return;
         },
         identify => sub {
             my $item = shift;
@@ -1401,8 +1402,8 @@ my @wishes = (
     },
 
     'uncursed magic marker' => {
-        predicate => sub { 1 },
-        identify  => sub {
+        avoid    => sub { return },
+        identify => sub {
             my $item = shift;
             $item->is_uncursed(1);
         },
@@ -1414,7 +1415,11 @@ sub respond_wish {
 
     for (my $i = 0; $i < @wishes; $i += 2) {
         my ($wish, $handlers) = @wishes[$i, $i+1];
-        next unless $handlers->{predicate}->();
+        my $avoid_reason = $handlers->{avoid}->();
+        if ($avoid_reason) {
+            TAEB->log->ai("Not wishing for '$wish' because $avoid_reason");
+            next;
+        }
 
         $self->last_wish($wish);
 
