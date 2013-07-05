@@ -739,7 +739,7 @@ sub eat_tile_food {
 
 sub to_food {
     my $self = shift;
-    return if $self->carried_nutrition > 1000;
+    return if $self->carried_nutrition > 3000;
     return unless any { $_->type eq 'food' } TAEB->current_level->items;
 
     path_to(sub {
@@ -760,7 +760,7 @@ sub pickup_goody {
 sub pickup_food {
     my $self = shift;
 
-    return if $self->carried_nutrition > 1000;
+    return if $self->carried_nutrition > 3000;
     return unless any { $self->want_food($_) } TAEB->current_tile->items;
 
     return TAEB::Action::Pickup->new;
@@ -770,7 +770,7 @@ sub want_food {
     my $self = shift;
     my $food = shift;
 
-    return if $self->carried_nutrition > 1000;
+    return if $self->carried_nutrition > 3000;
     return unless $food->type eq 'food';
     return unless $food->is_safely_edible;
     return if $food->subtype eq 'corpse' && !$food->permanent;
