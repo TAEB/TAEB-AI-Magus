@@ -44,6 +44,7 @@ our @behaviors = (qw/
     pray
 
     wish
+    recharge_wishing
 
     put_on_conflict
     take_off_conflict
@@ -522,6 +523,55 @@ sub wish {
     return TAEB::Action::Zap->new(
         wand => $wand,
     );
+}
+
+sub recharge_wishing {
+    my $wand = TAEB->inventory->find(
+        identity  => "wand of wishing",
+        charges   => 0,
+        recharges => [ undef, 0 ],
+    ) or return;
+
+    my $blessed_scroll = TAEB->inventory->find(
+        identity   => "scroll of charging",
+        is_blessed => 1,
+    );
+
+    if ($blessed_scroll) {
+        return TAEB::Action::Read->new(
+            scroll => $blessed_scroll,
+            charge => $wand,
+        );
+    }
+
+
+    my $uncursed_scroll = TAEB->inventory->find(
+        identity => "scroll of charging",
+        is_uncursed => 1,
+    );
+
+    my $dip = dip_bless($uncursed_scroll);
+    return $dip if $dip;
+
+
+    my $unknown_scroll = TAEB->inventory->find(
+        identity => "scroll of charging",
+        buc      => undef,
+    );
+
+    $dip = dip_bless($unknown_scroll);
+    return $dip if $dip;
+
+
+    my $cursed_scroll = TAEB->inventory->find(
+        identity => "scroll of charging",
+        is_cursed => 1,
+    );
+
+    $dip = dip_bless($cursed_scroll);
+    return $dip if $dip;
+
+    return;
 }
 
 sub heal_self {
