@@ -1002,7 +1002,7 @@ sub shed_carcass {
     my @carcasses;
     for my $corpse (TAEB->inventory->find(subtype => 'corpse')) {
         next if $self->want_food($corpse);
-        push @carcasses, $corpse if $corpse->failed_to_sacrifice;
+        push @carcasses, $corpse if !$self->would_sacrifice($corpse);
     }
 
     return unless @carcasses;
