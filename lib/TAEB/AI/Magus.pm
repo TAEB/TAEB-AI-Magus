@@ -36,6 +36,7 @@ with (
 
 my @behaviors = (qw/
     pray
+
     put_on_conflict
     take_off_conflict
     heal_self
@@ -48,22 +49,29 @@ my @behaviors = (qw/
     take_off_regen
     wait_scare_monster
     hunt
+
     pickup_goody
+
     pickup_food
     to_food
     eat_inventory
     eat_tile_food
+
     to_interesting
     to_goody
     uncurse_goody
     buff_.*
     put_on_pois_res
+
     descend
     to_stairs
     open_door
     to_door
+
     practice_spells
+
     explore
+
     magic_map
     search
 /);
