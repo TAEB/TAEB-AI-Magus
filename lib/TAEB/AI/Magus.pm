@@ -69,14 +69,15 @@ our @behaviors = (qw/
     pickup_sac
     to_sac
 
-    descend
-    to_stairs
     open_door
     to_door
 
     practice_spells
 
     explore
+
+    descend
+    to_stairs
 
     hang_around_altar
 
