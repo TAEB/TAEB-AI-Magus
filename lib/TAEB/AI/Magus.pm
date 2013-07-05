@@ -652,6 +652,10 @@ sub hunt {
 sub descend {
     return unless TAEB->current_tile->type eq 'stairsdown';
 
+    # stick around until we get Magicbane :)
+    return if $self->offerable_altars
+           && !TAEB->seen_artifact('Magicbane');
+
     return TAEB::Action::Descend->new;
 }
 
