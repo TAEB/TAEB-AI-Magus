@@ -72,6 +72,8 @@ our @behaviors = (qw/
     open_door
     to_door
 
+    oracle_statues
+
     practice_spells
 
     explore
@@ -831,6 +833,45 @@ sub open_door {
 
 sub to_door {
     path_to('closeddoor', include_endpoints => 1);
+}
+
+sub oracle_statues {
+    return unless TAEB->current_level->is_oracle;
+    return unless any { $_->type eq 'statue' } TAEB->current_level->items;
+
+    my $direction;
+    if (any { $_->type eq 'statue' } TAEB->current_tile->items) {
+        $direction = '>';
+    }
+    else {
+        $direction = TAEB->current_level->radiate(
+            sub { shift->find_item(type => "statue") },
+            max         => $spell->minimum_range,
+
+            stopper     => sub {
+                my $self = shift;
+                return 1 if $self->has_friendly;
+                return 1 if $self->has_monster && $self->monster->is_nymph;
+                return 0;
+            },
+            stopper_max => $spell->maximum_range,
+        );
+    }
+
+    if (!$direction) {
+        return path_to(sub { any { $_->type eq 'statue' } shift->items });
+    }
+
+    # restore Pw if needed
+    my $spell = TAEB->find_castable("force bolt");
+    if (!$spell) {
+        return TAEB::Action::Search->new(iterations => 20);
+    }
+
+    return TAEB::Action::Cast->new(
+        spell     => $spell,
+        direction => $direction,
+    );
 }
 
 sub practice_spells {
