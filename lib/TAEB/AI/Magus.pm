@@ -1114,7 +1114,6 @@ sub would_sacrifice {
     return unless $corpse->match(subtype => 'corpse');
 
     return if $self->want_food($corpse);
-    return if $corpse->failed_to_sacrifice;
     return if !$corpse->should_sacrifice;
 
     if ($prospective) {
