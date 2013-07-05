@@ -632,15 +632,29 @@ sub descend {
 }
 
 sub eat_inventory {
-    return if TAEB->nutrition > 995;
+    return if TAEB->nutrition > 150;
 
-    for my $food (TAEB->inventory->find(type => 'food')) {
-        next unless $food->is_safely_edible;
+    my @foods = grep { $_->is_safely_edible } TAEB->inventory->find(type => 'food');
+    return unless @foods;
 
-        return TAEB::Action::Eat->new(food => $food);
+    # find and eat the food with the worst nutrition/weight ratio
+    my $metric = 'nutrition_per_weight';
+
+    # OR when there are monsters around, with the fewest turns to eat
+    $metric = 'time' if find_adjacent(sub { shift->has_enemy });
+
+    my $best = shift @foods;
+    for my $food (@foods) {
+        # don't eat lizard corpses except as a last resort
+        next if $food->subtype eq 'corpse'
+             && $food->monster->name eq 'lizard';
+
+        if ($food->$metric < $best->$metric) {
+            $best = $food;
+        }
     }
 
-    return;
+    return TAEB::Action::Eat->new(food => $best);
 }
 
 sub eat_tile_food {
