@@ -387,6 +387,10 @@ sub buff_haste_self {
     my $spell = TAEB->find_castable("haste self")
         or return;
 
+    # if we're at max power, we can cast it even if it's very likely to fail
+    return unless TAEB->power == TAEB->maxpower
+               || $spell->fail <= 30;
+
     return TAEB::Action::Cast->new(spell => $spell);
 }
 
