@@ -220,6 +220,14 @@ sub take_off_conflict {
     return TAEB::Action::Remove->new(item => $ring);
 }
 
+sub buff_wield_magicbane {
+    my $magicbane = TAEB->inventory->find("Magicbane")
+        or return;
+    return if $magicbane->is_wielded;
+
+    return TAEB::Action::Wield->new(weapon => $magicbane);
+}
+
 sub buff_polypotion_spellbook {
     my $polymorph = TAEB->inventory->find("potion of polymorph")
         or return;
@@ -726,6 +734,7 @@ sub want_goody {
     my $self = shift;
     my $item = shift;
 
+    return 1 if $item->identity eq 'Magicbane';
     return 1 if $item->type eq 'spellbook';
     return 1 if $item->match('magic marker');
 
