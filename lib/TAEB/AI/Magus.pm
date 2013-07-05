@@ -59,6 +59,8 @@ our @behaviors = (qw/
     wait_scare_monster
     hunt
 
+    wrest_wish
+
     pickup_goody
 
     pickup_food
@@ -518,6 +520,18 @@ sub wish {
     my $wand = TAEB->inventory->find(
         identity => "wand of wishing",
         charges  => [ undef, sub { $_ > 0 } ],
+    ) or return;
+
+    return TAEB::Action::Zap->new(
+        wand => $wand,
+    );
+}
+
+sub wrest_wish {
+    my $wand = TAEB->inventory->find(
+        identity  => "wand of wishing",
+        charges   => 0,
+        recharges => 1,
     ) or return;
 
     return TAEB::Action::Zap->new(
