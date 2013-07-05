@@ -60,6 +60,7 @@ our @behaviors = (qw/
     to_unknown_items
     to_goody
     uncurse_goody
+    identify_.*
     buff_.*
     put_on_pois_res
 
@@ -466,6 +467,21 @@ sub buff_speed_monster {
         wand      => $wand,
         direction => '.',
     );
+}
+
+sub identify_wand {
+    return unless TAEB::Action::Engrave->is_advisable;
+
+    for my $wand (TAEB->inventory->find(type => 'wand', identity => undef)) {
+        my $tracker = $wand->tracker->engrave_useful
+            or next;
+
+        if (TAEB->current_tile->engraving eq '') {
+            return TAEB::Action::Engrave->new(engraver => '-');
+        }
+
+        return TAEB::Action::Engrave->new(engraver => $wand);
+    }
 }
 
 sub pray {
