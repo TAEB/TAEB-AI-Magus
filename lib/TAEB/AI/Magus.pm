@@ -34,7 +34,7 @@ with (
     },
 );
 
-my @behaviors = (qw/
+our @behaviors = (qw/
     pray
 
     put_on_conflict
