@@ -758,6 +758,7 @@ sub want_food {
     return unless $food->type eq 'food';
     return unless $food->is_safely_edible;
     return if $food->subtype eq 'corpse' && !$food->permanent;
+    return if $food->cost;
 
     return 1;
 }
