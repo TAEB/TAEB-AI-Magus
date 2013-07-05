@@ -688,7 +688,10 @@ sub eat_inventory {
 }
 
 sub eat_tile_food {
+    my $self = shift;
+
     return if TAEB->nutrition > 995;
+    return if $self->offerable_altars && TAEB->nutrition > 100;
     return if TAEB->current_tile->in_shop;
 
     for my $food (grep { $_->type eq 'food' } TAEB->current_tile->items) {
