@@ -1,7 +1,7 @@
 package TAEB::AI::Magus;
 use Moose;
 use TAEB::OO;
-use TAEB::Util qw/uniq all any sum/;
+use TAEB::Util qw/uniq all any sum refaddr/;
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
@@ -62,6 +62,11 @@ my @behaviors = (qw/
     uncurse_goody
     buff_.*
     put_on_pois_res
+
+    sacrifice_here
+    shed_carcass
+    to_altar
+    to_sac
 
     descend
     to_stairs
@@ -879,6 +884,75 @@ sub to_search {
     );
 }
 
+sub sacrifice_here {
+    my $self = shift;
+
+    my $tile = TAEB->current_tile;
+    return unless $tile->type eq 'altar';
+    return if $tile->in_temple && !$tile->is_coaligned;
+
+    my @corpses = (
+        TAEB->inventory->find(subtype => 'corpse'),
+        TAEB->current_tile->find_item(subtype => 'corpse'),
+    );
+
+    for my $corpse (@corpses) {
+        next unless $self->would_sacrifice($corpse);
+
+        return TAEB::Action::Offer->new(
+            item => $corpse,
+        );
+    }
+
+    return;
+}
+
+sub shed_carcass {
+    my $self = shift;
+
+    my @carcasses;
+    for my $corpse (TAEB->inventory->find(subtype => 'corpse')) {
+        next if $self->want_food($corpse);
+        push @carcasses, $corpse if $corpse->failed_to_sacrifice;
+    }
+
+    return unless @carcasses;
+
+    return TAEB::Action::Drop->new(
+        items => \@carcasses,
+    );
+}
+
+sub to_altar {
+    my $self = shift;
+    my @altars = $self->offerable_altars
+        or return;
+    my %is_offerable = map { refaddr $_ } @altars;
+
+    return unless any { $self->would_sacrifice($_) }
+                  TAEB->inventory->find(subtype => 'corpse');
+
+    path_to(sub { $is_offerable{ refaddr shift } });
+}
+
+sub pickup_sac {
+    my $self = shift;
+    return unless $self->offerable_altars;
+    return unless any { $self->would_sacrifice($_, 1) }
+                  TAEB->current_tile->items;
+
+    return TAEB::Action::Pickup->new;
+}
+
+sub to_sac {
+    my $self = shift;
+    return unless $self->offerable_altars;
+    return unless any { $self->would_sacrifice($_, 1) }
+                  TAEB->current_level->items;
+
+    path_to(sub { any { $self->would_sacrifice($_, 1) } shift->items });
+}
+
 sub find_adjacent {
     my $code = shift;
 
@@ -996,9 +1070,41 @@ subscribe query_pickupitems => sub {
         my $item = shift->user_data;
         return 1 if $self->want_food($item);
         return 1 if $self->want_goody($item);
+
+        if ($self->offerable_altars) {
+            return 1 if $self->would_sacrifice($item, 1);
+        }
+
         return 0;
     });
 };
+
+sub would_sacrifice {
+    my $self = shift;
+    my $corpse = shift;
+    my $prospective = shift;
+
+    return unless $corpse->subtype eq 'corpse';
+
+    return if $self->want_food($corpse);
+    return if $corpse->failed_to_sacrifice;
+    return if !$corpse->should_sacrifice;
+
+    if ($prospective) {
+        return if $corpse->age > 10;
+        return if $corpse->weight + TAEB->inventory->weight > xxx;
+    }
+
+    return 1;
+}
+
+sub offerable_altars {
+    my $self = shift;
+
+    my @altars = any { $_->is_coaligned || !$_->in_temple }
+                 TAEB->current_level->has_type('altar');
+    return @altars;
+}
 
 1;
 
