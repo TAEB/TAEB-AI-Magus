@@ -888,7 +888,7 @@ sub hang_around_altar {
 
     my @altars = $self->offerable_altars
         or return;
-    my %is_offerable = map { refaddr $_ } @altars;
+    my %is_offerable = map { (refaddr $_) => 1 } @altars;
 
     return TAEB::Action::Search->new(iterations => 20)
         if $is_offerable{refaddr(TAEB->current_tile)};
