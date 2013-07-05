@@ -350,18 +350,28 @@ sub buff_enchant_armor {
     );
 }
 
-sub buff_great_potion {
+sub buff_see_invis {
     my $potion = TAEB->inventory->find(
-        identity => [
-            'potion of see invisible',
-            'potion of gain ability',
-        ],
+        identity => 'potion of see invisible',
         is_cursed => 0,
     ) or return;
 
     return dip_bless($potion)
-        if $potion->identity eq 'potion of see invisible'
-        && !$potion->is_blessed;
+        unless $potion->is_blessed;
+
+    return TAEB::Action::Quaff->new(
+        from => $potion,
+    );
+}
+
+sub buff_great_potion {
+    my $potion = TAEB->inventory->find(
+        identity => [
+            'potion of gain ability',
+            'potion of gain energy',
+        ],
+        is_cursed => 0,
+    ) or return;
 
     return dip_bless($potion) || TAEB::Action::Quaff->new(
         from => $potion,
