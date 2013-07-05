@@ -1226,5 +1226,16 @@ sub stay_on_level {
     return 0;
 }
 
+sub respond_wish {
+    return "blessed fixed greased Master Key of Thievery\n"
+        if TAEB->hp > 20
+        && !TAEB->seen_artifact('Master Key of Thievery');
+
+    return "blessed fixed greased +3 silver dragon scale mail\n"
+        unless TAEB->has_item(/dragon scale mail/);
+
+    return "uncursed magic marker\n";
+}
+
 1;
 
