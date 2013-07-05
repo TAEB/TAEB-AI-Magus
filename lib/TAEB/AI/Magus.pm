@@ -1129,7 +1129,7 @@ sub would_sacrifice {
 sub offerable_altars {
     my $self = shift;
 
-    my @altars = any { $_->is_coaligned || !$_->in_temple }
+    my @altars = grep { $_->is_coaligned || !$_->in_temple }
                  TAEB->current_level->has_type('altar');
     return @altars;
 }
