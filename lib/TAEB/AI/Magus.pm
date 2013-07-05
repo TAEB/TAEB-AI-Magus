@@ -49,7 +49,8 @@ my @behaviors = (qw/
     hunt
     to_food
     pickup_food
-    eat_here
+    eat_inventory
+    eat_tile_food
     to_item
     buff_.*
     put_on_pois_res
@@ -629,7 +630,19 @@ sub descend {
     return TAEB::Action::Descend->new;
 }
 
-sub eat_here {
+sub eat_inventory {
+    return if TAEB->nutrition > 995;
+
+    for my $food (TAEB->inventory->find(type => 'food')) {
+        next unless $food->is_safely_edible;
+
+        return TAEB::Action::Eat->new(food => $food);
+    }
+
+    return;
+}
+
+sub eat_tile_food {
     return if TAEB->nutrition > 995;
     return if TAEB->current_tile->in_shop;
 
