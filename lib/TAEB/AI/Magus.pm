@@ -748,7 +748,7 @@ sub want_goody {
     my $self = shift;
     my $item = shift;
 
-    return 1 if $item->identity eq 'Magicbane';
+    return 1 if $item->match('Magicbane');
     return 1 if $item->type eq 'spellbook';
     return 1 if $item->match('magic marker');
 
