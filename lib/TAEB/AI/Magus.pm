@@ -389,7 +389,7 @@ sub buff_enchant_ring {
     for my $ring (@rings) {
         next if $ring->is_worn;
         next unless $ring->enchantment_known;
-        next unless $ring->numeric_enchantment > 2;
+        next unless $ring->numeric_enchantment >= 2;
 
         return TAEB::Action::Wear->new(item => $ring);
     }
