@@ -48,11 +48,13 @@ my @behaviors = (qw/
     take_off_regen
     wait_scare_monster
     hunt
+    pickup_goody
     pickup_food
     to_food
     eat_inventory
     eat_tile_food
     to_interesting
+    to_goody
     buff_.*
     put_on_pois_res
     descend
@@ -682,6 +684,14 @@ sub to_food {
     });
 }
 
+sub pickup_goody {
+    my $self = shift;
+
+    return unless any { $self->want_goody($_) } TAEB->current_tile->items;
+
+    return TAEB::Action::Pickup->new;
+}
+
 sub pickup_food {
     my $self = shift;
 
@@ -703,9 +713,25 @@ sub want_food {
     return 1;
 }
 
+sub want_goody {
+    my $self = shift;
+    my $item = shift;
+
+    return 1 if $item->type eq 'spellbook';
+    return 1 if $item->match('magic marker');
+
+    return 0;
+}
+
 sub to_interesting {
     return unless TAEB->current_level->has_type('interesting');
     path_to(sub { shift->is_interesting });
+}
+
+sub to_goody {
+    my $self = shift;
+    return unless any { $self->want_goody($_) } TAEB->current_level->items;
+    path_to(sub { any { $self->want_goody($_) } shift->items });
 }
 
 sub to_stairs {
@@ -900,6 +926,7 @@ subscribe query_pickupitems => sub {
     $event->menu->select(sub {
         my $item = shift->user_data;
         return 1 if $self->want_food($item);
+        return 1 if $self->want_goody($item);
         return 0;
     });
 };
