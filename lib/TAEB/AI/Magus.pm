@@ -381,6 +381,15 @@ sub buff_slow_digestion {
     return TAEB::Action::Wear->new(item => $ring);
 }
 
+sub buff_haste_self {
+    return if TAEB->senses->is_very_fast;
+
+    my $spell = TAEB->find_castable("haste self")
+        or return;
+
+    return TAEB::Action::Cast->new(spell => $spell);
+}
+
 sub pray {
     return unless TAEB::Action::Pray->is_advisable;
 
