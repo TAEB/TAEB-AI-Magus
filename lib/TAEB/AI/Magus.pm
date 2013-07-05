@@ -19,6 +19,12 @@ has queue_manager => (
     default => sub { TAEB::AI::Magus::QueueManager->new(magus => shift) },
 );
 
+has last_wish => (
+    is      => 'rw',
+    isa     => 'Str',
+    clearer => '_clear_last_wish',
+);
+
 with (
     'TAEB::AI::Role::Action::Backoff' => {
         action       => 'TAEB::Action::Cast',
@@ -1226,33 +1232,141 @@ sub stay_on_level {
     return 0;
 }
 
-sub respond_wish {
-    # is this a wand wish? if so, our first wish should be ?oC
-    my $action = TAEB->action;
-    if ($action->isa('TAEB::Action::Zap') || $action->isa('TAEB::Action::Engrave')) {
-        return "2 blessed scrolls of charging"
-            unless TAEB->has_item(
+my @wishes = (
+    '2 blessed scrolls of charging' => {
+        predicate => sub {
+            # only wish for b?oC if we used a wand to get this wish
+            my $action = TAEB->action;
+            return 0 unless $action->isa('TAEB::Action::Zap')
+                         || $action->isa('TAEB::Action::Engrave'));
+
+            # don't bother if we already have a scroll of charging
+            return 0 if TAEB->has_item(
                 identity => 'scroll of charging',
                 is_blessed => 1,
-            ) || (
-                TAEB->has_item(
-                    identity => 'scroll of charging',
-                ) && TAEB->has_item(
-                    identity   => 'potion of water',
-                    is_blessed => 1,
-                )
             );
+
+            # don't bother if we have charging and can bless it
+            return 0 if TAEB->has_item(
+                identity    => 'scroll of charging',
+                is_uncursed => 1,
+            ) && TAEB->has_item(
+                identity   => 'potion of water',
+                is_blessed => 1,
+            );
+
+            # XXX if our charging is cursed (or unknown) and we have 2 holy water, still don't need to wish for it, but that'll probably be rare
+            return 1;
+        },
+        identify => sub {
+            my $item = shift;
+            $item->is_blessed(1);
+            $item->tracker->identify_as('scroll of charging');
+        },
+    },
+    'blessed fixed greased Master Key of Thievery' => {
+        predicate => sub {
+            return 0 if TAEB->hp <= 20; # artifact blast
+            return 0 if TAEB->seen_artifact('Master Key of Thievery');
+            return 1;
+        },
+        identify => sub {
+            my $item = shift;
+            $item->is_blessed(1);
+            $item->is_greased(1);
+        },
+    },
+    'blessed fixed greased +3 silver dragon scale mail' => {
+        predicate => sub {
+            return 0 if TAEB->has_item(/dragon scale mail/);
+            return 1;
+        },
+        identify => sub {
+            my $item = shift;
+            $item->is_blessed(1);
+            $item->is_greased(1);
+        },
+    },
+    'blessed fixed greased +3 speed boots' => {
+        predicate => sub {
+            return 0 if TAEB->has_item(/speed boots/);
+            return 1;
+        },
+        identify => sub {
+            my $item = shift;
+            $item->is_blessed(1);
+            $item->is_greased(1);
+        },
+    },
+
+    'blessed fixed greased +3 helm of brilliance' => {
+        predicate => sub {
+            return 0 if TAEB->has_item(/helm of brilliance/);
+            return 1;
+        },
+        identify => sub {
+            my $item = shift;
+            $item->is_blessed(1);
+            $item->is_greased(1);
+        },
+    },
+
+    'blessed fixed greased ring of conflict' => {
+        predicate => sub {
+            return 0 if TAEB->has_item(/ring of conflict/);
+            return 1;
+        },
+        identify => sub {
+            my $item = shift;
+            $item->is_blessed(1);
+            $item->is_greased(1);
+        },
+    },
+
+    'uncursed magic marker' => {
+        predicate => sub { 1 },
+        identify  => sub {
+            my $item = shift;
+            $item->is_uncursed(1);
+        },
+    },
+);
+
+sub respond_wish {
+    my $self = shift;
+
+    for (my $i = 0; $i < @wishes; $i += 2) {
+        my ($wish, $handlers) = @wishes[$i, $i+1];
+        next unless $handlers->{predicate}->();
+
+        $self->last_wish($wish);
+
+        return "$wish\n";
     }
-
-    return "blessed fixed greased Master Key of Thievery\n"
-        if TAEB->hp > 20
-        && !TAEB->seen_artifact('Master Key of Thievery');
-
-    return "blessed fixed greased +3 silver dragon scale mail\n"
-        unless TAEB->has_item(/dragon scale mail/);
-
-    return "uncursed magic marker\n";
 }
+
+subscribe step => sub {
+    my $self = shift;
+    $self->_clear_last_wish;
+}
+
+subscribe got_item => sub {
+    my $self = shift;
+    my $event = shift;
+
+    my $new_item = $event->item;
+
+    if ($self->last_wish) {
+        for (my $i = 0; $i < @wishes; $i += 2) {
+            my ($wish, $handlers) = @wishes[$i, $i+1];
+            next unless $wish eq $self->last_wish;
+            $handlers->{identify}->($item);
+            return;
+        }
+
+        TAEB->log->ai("No handler for wish $wish!", level => "error");
+    }
+};
 
 1;
 
