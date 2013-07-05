@@ -650,11 +650,11 @@ sub hunt {
 }
 
 sub descend {
+    my $self = shift;
+
     return unless TAEB->current_tile->type eq 'stairsdown';
 
-    # stick around until we get Magicbane :)
-    return if $self->offerable_altars
-           && !TAEB->seen_artifact('Magicbane');
+    return if $self->stay_on_level;
 
     return TAEB::Action::Descend->new;
 }
@@ -786,6 +786,10 @@ sub to_goody {
 }
 
 sub to_stairs {
+    my $self = shift;
+
+    return if $self->stay_on_level;
+
     path_to('stairsdown');
 }
 
@@ -1096,7 +1100,9 @@ sub would_sacrifice {
 
     if ($prospective) {
         return if $corpse->age > 10;
-        return if $corpse->weight + TAEB->inventory->weight > xxx;
+        # I have no idea what values of inventory are Burdened etc
+        # depends on Str, so we should model that in TAEB
+        # return if $corpse->weight + TAEB->inventory->weight > xxx;
     }
 
     return 1;
@@ -1108,6 +1114,16 @@ sub offerable_altars {
     my @altars = any { $_->is_coaligned || !$_->in_temple }
                  TAEB->current_level->has_type('altar');
     return @altars;
+}
+
+sub stay_on_level {
+    my $self = shift;
+
+    # stick around until we get Magicbane :)
+    return 1 if $self->offerable_altars
+             && !TAEB->seen_artifact('Magicbane');
+
+    return 0;
 }
 
 1;
