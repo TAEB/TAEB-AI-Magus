@@ -1414,6 +1414,20 @@ my @wishes = (
         },
     },
 
+    'blessed fixed greased +3 gauntlets of dexterity' => {
+        avoid => sub {
+            return "have gauntlets of dexterity" if TAEB->inventory->find('gauntlets of dexterity');
+            return;
+        },
+        identify => sub {
+            my $item = shift;
+            $item->is_blessed(1);
+            $item->is_greased(1);
+            return unless $item->has_tracker;
+            $item->tracker->identify_as("gauntlets of dexterity");
+        },
+    },
+
     'uncursed magic marker' => {
         avoid    => sub { return },
         identify => sub {
