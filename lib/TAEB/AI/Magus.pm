@@ -454,12 +454,19 @@ sub multi_bolt {
         or return;
     my $is_force_bolt = $spell->name eq 'force bolt';
 
+    my $verboten = 0;
     my $seen_enemies;
     my $direction = TAEB->current_level->radiate(
         sub {
-            my $tile = shift;
+            my ($tile, $distance) = @_;
             if ($tile->has_enemy && $tile->monster->currently_seen) {
                 $seen_enemies++;
+
+                # XXX verboten needs to forbid directions
+                if ($distance == 1 && $tile->monster->has_possibility('gas spore')) {
+                    $verboten = 1;
+                    return;
+                }
             }
             return $seen_enemies > 1;
         },
@@ -483,6 +490,8 @@ sub multi_bolt {
 
         started_new_direction => sub { $seen_enemies = 0 },
     );
+
+    return if $verboten;
     return unless $direction;
 
     return TAEB::Action::Cast->new(
@@ -530,11 +539,21 @@ sub single_bolt {
         or return;
     my $is_force_bolt = $spell->name eq 'force bolt';
 
+    my $verboten = 0;
+
     my $direction = TAEB->current_level->radiate(
         sub {
-            my $tile = shift;
-            return $tile->has_enemy
-                && $tile->monster->currently_seen;
+            my ($tile, $distance) = @_;
+            return unless $tile->has_enemy;
+            return unless $tile->monster->currently_seen;
+
+            # XXX verboten needs to forbid directions
+            if ($distance == 1 && $tile->monster->has_possibility('gas spore')) {
+                $verboten = 1;
+                return;
+            }
+
+            return 1;
         },
         max         => $spell->minimum_range,
 
@@ -554,6 +573,7 @@ sub single_bolt {
         },
         stopper_max => $spell->maximum_range,
     );
+    return if $verboten;
     return unless $direction;
 
     return TAEB::Action::Cast->new(
