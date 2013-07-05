@@ -780,12 +780,16 @@ sub practice_spells {
     return if TAEB->power < 20;
     return if TAEB->power < TAEB->maxpower;
 
-    return $self->practice_haste_self
+    return $self->practice_nodir("haste self")
+        || $self->practice_nodir("remove curse")
         || $self->practice_force_bolt;
 }
 
-sub practice_haste_self {
-    my $spell = TAEB->find_castable("haste self")
+sub practice_nodir {
+    my $self = shift;
+    my $name = shift;
+
+    my $spell = TAEB->find_castable($name)
         or return;
 
     return TAEB::Action::Cast->new(spell => $spell);
