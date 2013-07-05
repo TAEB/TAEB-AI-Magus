@@ -66,6 +66,7 @@ our @behaviors = (qw/
     sacrifice_here
     shed_carcass
     to_altar
+    pickup_sac
     to_sac
 
     descend
