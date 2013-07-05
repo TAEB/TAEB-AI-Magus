@@ -1227,6 +1227,23 @@ sub stay_on_level {
 }
 
 sub respond_wish {
+    # is this a wand wish? if so, our first wish should be ?oC
+    my $action = TAEB->action;
+    if ($action->isa('TAEB::Action::Zap') || $action->isa('TAEB::Action::Engrave')) {
+        return "2 blessed scrolls of charging"
+            unless TAEB->has_item(
+                identity => 'scroll of charging',
+                is_blessed => 1,
+            ) || (
+                TAEB->has_item(
+                    identity => 'scroll of charging',
+                ) && TAEB->has_item(
+                    identity   => 'potion of water',
+                    is_blessed => 1,
+                )
+            );
+    }
+
     return "blessed fixed greased Master Key of Thievery\n"
         if TAEB->hp > 20
         && !TAEB->seen_artifact('Master Key of Thievery');
