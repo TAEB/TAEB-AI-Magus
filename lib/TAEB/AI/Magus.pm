@@ -1,6 +1,6 @@
 package TAEB::AI::Magus;
 use Moose;
-use TAEB::Util 'uniq', 'all', 'any';
+use TAEB::Util qw/uniq all any sum/;
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
@@ -47,6 +47,8 @@ my @behaviors = (qw/
     take_off_regen
     wait_scare_monster
     hunt
+    to_food
+    pickup_food
     eat_here
     to_item
     buff_.*
@@ -640,6 +642,50 @@ sub eat_here {
     return;
 }
 
+sub to_food {
+    my $self = shift;
+    return if $self->carried_nutrition > 1000;
+    return unless any { $_->type eq 'food' } TAEB->current_level->items;
+
+    path_to(sub {
+        my $tile = shift;
+        my @items = $tile->items;
+        return any { $self->want_food($_) } grep { $_->type eq 'food' } @items;
+    });
+}
+
+sub pickup_food {
+    my $self = shift;
+
+    return if $self->carried_nutrition > 1000;
+    return unless any { $self->want_food($_) } TAEB->current_tile->items;
+
+    return TAEB::Action::Pickup->new;
+}
+
+subscribe query_pickupitems => sub {
+    my $self = shift;
+    my $event = shift;
+
+    $event->menu->select(sub {
+        my $item = shift->user_data;
+        return 1 if $self->want_food($item);
+        return 0;
+    });
+};
+
+sub want_food {
+    my $self = shift;
+    my $food = shift;
+
+    return if $self->carried_nutrition > 1000;
+    return unless $food->type eq 'food';
+    return unless $food->is_safely_edible;
+    return if $food->subtype eq 'corpse' && !$food->permanent;
+
+    return 1;
+}
+
 sub to_item {
     return unless TAEB->current_level->has_type('interesting');
     path_to(sub { shift->is_interesting });
@@ -824,6 +870,10 @@ sub attack_spell {
     }
 
     return $force_bolt || $magic_missile || undef;
+}
+
+sub carried_nutrition {
+    sum { $_->nutrition } TAEB->inventory->find(type => "food");
 }
 
 1;
