@@ -1,5 +1,6 @@
 package TAEB::AI::Magus;
 use Moose;
+use TAEB::OO;
 use TAEB::Util qw/uniq all any sum/;
 extends 'TAEB::AI';
 
@@ -47,8 +48,8 @@ my @behaviors = (qw/
     take_off_regen
     wait_scare_monster
     hunt
-    to_food
     pickup_food
+    to_food
     eat_inventory
     eat_tile_food
     to_item
@@ -676,17 +677,6 @@ sub pickup_food {
     return TAEB::Action::Pickup->new;
 }
 
-subscribe query_pickupitems => sub {
-    my $self = shift;
-    my $event = shift;
-
-    $event->menu->select(sub {
-        my $item = shift->user_data;
-        return 1 if $self->want_food($item);
-        return 0;
-    });
-};
-
 sub want_food {
     my $self = shift;
     my $food = shift;
@@ -886,8 +876,19 @@ sub attack_spell {
 }
 
 sub carried_nutrition {
-    sum { $_->nutrition } TAEB->inventory->find(type => "food");
+    sum map { $_->nutrition } TAEB->inventory->find(type => "food");
 }
+
+subscribe query_pickupitems => sub {
+    my $self = shift;
+    my $event = shift;
+
+    $event->menu->select(sub {
+        my $item = shift->user_data;
+        return 1 if $self->want_food($item);
+        return 0;
+    });
+};
 
 1;
 
