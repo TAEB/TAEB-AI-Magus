@@ -1362,7 +1362,7 @@ my @wishes = (
     },
     'blessed fixed greased +3 silver dragon scale mail' => {
         avoid => sub {
-            return "have DSM" if TAEB->has_item(/dragon scale mail/);
+            return "have DSM" if TAEB->inventory->find('silver dragon scale mail');
             return;
         },
         identify => sub {
@@ -1373,7 +1373,7 @@ my @wishes = (
     },
     'blessed fixed greased +3 speed boots' => {
         avoid => sub {
-            return "have speed boots" if TAEB->has_item(/speed boots/);
+            return "have speed boots" if TAEB->inventory->find('speed boots');
             return;
         },
         identify => sub {
@@ -1385,7 +1385,7 @@ my @wishes = (
 
     'blessed fixed greased +3 helm of brilliance' => {
         avoid => sub {
-            return "have helm of brilliance" if TAEB->has_item(/helm of brilliance/);
+            return "have helm of brilliance" if TAEB->inventory->find('helm of brilliance');
             return;
         },
         identify => sub {
@@ -1397,7 +1397,7 @@ my @wishes = (
 
     'blessed fixed greased ring of conflict' => {
         avoid => sub {
-            return "have ring of conflict" if TAEB->has_item(/ring of conflict/);
+            return "have ring of conflict" if TAEB->inventory->find('ring of conflict');
             return;
         },
         identify => sub {
