@@ -55,6 +55,7 @@ my @behaviors = (qw/
     eat_tile_food
     to_interesting
     to_goody
+    uncurse_goody
     buff_.*
     put_on_pois_res
     descend
@@ -726,6 +727,30 @@ sub want_goody {
 sub to_interesting {
     return unless TAEB->current_level->has_type('interesting');
     path_to(sub { shift->is_interesting });
+}
+
+sub uncurse_goody {
+    my $remove_curse = TAEB->find_castable('remove curse')
+        or return;
+    return if $remove_curse->fail > 50;
+
+    my $goody = TAEB->inventory->find(
+        is_cursed => [undef, 1],
+    );
+
+    # no need to wield the item if we're skilled or expert
+    my $level = TAEB->senses->level_for_skill('clerical');
+    if ($level eq 'Skilled' || $level eq 'Expert') {
+        return TAEB::Action::Cast->new(spell => $remove_curse);
+    }
+
+    my $weapon = TAEB->equipment->weapon || "nothing";
+
+    return [
+        TAEB::Action::Wield->new(weapon => $goody),
+        TAEB::Action::Cast->new(spell => $remove_curse),
+        TAEB::Action::Wield->new(weapon => $weapon),
+    ];
 }
 
 sub to_goody {
