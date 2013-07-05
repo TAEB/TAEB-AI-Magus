@@ -772,7 +772,8 @@ sub want_goody {
     return 1 if $item->match('Magicbane');
     return 1 if $item->type eq 'spellbook';
     return 1 if $item->match('magic marker');
-    return 1 if $item->includes_possibility('magic lamp');
+    return 1 if $item->has_tracker
+             && $item->tracker->includes_possibility('magic lamp');
 
     return 0;
 }
