@@ -452,6 +452,20 @@ sub buff_haste_self {
     return TAEB::Action::Cast->new(spell => $spell);
 }
 
+sub buff_speed_monster {
+    return if TAEB->senses->is_fast;
+
+    my $wand = TAEB->inventory->find(
+        identity => "wand of speed monster",
+        charges  => [ undef, sub { $_ > 0 } ],
+    ) or return;
+
+    return TAEB::Action::Zap->new(
+        wand      => $wand,
+        direction => '.',
+    );
+}
+
 sub pray {
     return unless TAEB::Action::Pray->is_advisable;
 
