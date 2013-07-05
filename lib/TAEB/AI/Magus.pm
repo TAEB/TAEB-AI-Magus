@@ -553,7 +553,7 @@ sub recharge_wishing {
 
     if ($blessed_scroll) {
         return TAEB::Action::Read->new(
-            scroll => $blessed_scroll,
+            item   => $blessed_scroll,
             charge => $wand,
         );
     }
@@ -1315,7 +1315,7 @@ my @wishes = (
             # only wish for b?oC if we used a wand to get this wish
             my $action = TAEB->action;
             return 0 unless $action->isa('TAEB::Action::Zap')
-                         || $action->isa('TAEB::Action::Engrave'));
+                         || $action->isa('TAEB::Action::Engrave');
 
             # don't bother if we already have a scroll of charging
             return 0 if TAEB->has_item(
@@ -1425,23 +1425,23 @@ sub respond_wish {
 subscribe step => sub {
     my $self = shift;
     $self->_clear_last_wish;
-}
+};
 
 subscribe got_item => sub {
     my $self = shift;
     my $event = shift;
 
-    my $new_item = $event->item;
+    my $item = $event->item;
 
-    if ($self->last_wish) {
+    if (my $last_wish = $self->last_wish) {
         for (my $i = 0; $i < @wishes; $i += 2) {
             my ($wish, $handlers) = @wishes[$i, $i+1];
-            next unless $wish eq $self->last_wish;
+            next unless $wish eq $last_wish;
             $handlers->{identify}->($item);
             return;
         }
 
-        TAEB->log->ai("No handler for wish $wish!", level => "error");
+        TAEB->log->ai("No handler for wish $last_wish!", level => "error");
     }
 };
 
