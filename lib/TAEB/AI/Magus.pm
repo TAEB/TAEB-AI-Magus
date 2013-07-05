@@ -765,7 +765,15 @@ sub to_stairs {
 
 sub open_door {
     if_adjacent(closeddoor => sub {
-        return 'kick' if shift->is_locked;
+        my $tile = shift;
+        if ($tile->is_locked) {
+            if (TAEB->current_level->is_minetown) {
+                return;
+            }
+
+            return 'kick';
+        }
+
         return 'open';
     });
 }
