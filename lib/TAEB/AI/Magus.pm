@@ -352,7 +352,7 @@ sub buff_polypile_spellbook {
     ];
 }
 
-sub buff_reading_unknown_spellbook {
+sub buff_1_read_unknown_spellbook {
     my @books = TAEB->inventory->find(
         type      => 'spellbook',
         identity  => undef,
