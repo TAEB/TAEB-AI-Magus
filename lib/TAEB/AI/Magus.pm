@@ -391,7 +391,7 @@ sub buff_enchant_armor {
     ) or return;
 
     for my $slot (TAEB->equipment->armor_slots) {
-        my $equip = TAEB->equipment->get($slot)
+        my $equip = TAEB->equipment->$slot
             or next;
         return if !$equip->enchantment_known;
         return if $equip->numeric_enchantment >= 4;
