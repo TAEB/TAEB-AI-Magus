@@ -1380,7 +1380,7 @@ sub attack_spell {
 }
 
 sub carried_nutrition {
-    (sum map { $_->nutrition } TAEB->inventory->find(type => "food")) || 0;
+    (sum map { $_->quantity * $_->nutrition } TAEB->inventory->find(type => "food")) || 0;
 }
 
 subscribe query_pickupitems => sub {
