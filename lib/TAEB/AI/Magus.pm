@@ -360,7 +360,8 @@ sub buff_1_read_unknown_spellbook {
     );
 
     for my $book (@books) {
-        next if $book->difficult_for_level >= TAEB->level;
+        next if $book->difficult_for_level >= TAEB->level
+             && $book->difficult_for_int >= TAEB->int;
 
         return TAEB::Action::Read->new(
             item => $book,
