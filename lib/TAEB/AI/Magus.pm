@@ -641,9 +641,10 @@ sub wish {
 
 sub wrest_wish {
     my $wand = TAEB->inventory->find(
-        identity  => "wand of wishing",
-        charges   => 0,
-        recharges => 1,
+        identity        => "wand of wishing",
+        charges         => 0,
+        recharges       => [undef, 1],
+        times_recharged => 1,
     ) or return;
 
     # save the wrest for MKoT, when we can handle its damage
