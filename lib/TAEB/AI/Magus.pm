@@ -43,9 +43,6 @@ with (
 our @behaviors = (qw/
     pray
 
-    wish
-    recharge_wishing
-
     put_on_conflict
     take_off_conflict
     heal_self
@@ -59,6 +56,8 @@ our @behaviors = (qw/
     wait_scare_monster
     hunt
 
+    wish
+    recharge_wishing
     wrest_wish
 
     pickup_goody
