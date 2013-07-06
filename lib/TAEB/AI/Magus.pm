@@ -88,6 +88,7 @@ our @behaviors = (qw/
 
     practice_spells
 
+    wait_blind
     explore
 
     descend
@@ -1158,6 +1159,14 @@ sub practice_force_bolt {
         spell     => $force_bolt,
         direction => '>',
     );
+}
+
+sub wait_blind {
+    return unless TAEB->senses->is_blind;
+
+    return TAEB::Action::Wipe->new if TAEB->senses->is_pie_blind;
+
+    return TAEB::Action::Search->new(iterations => 20);
 }
 
 sub explore {
