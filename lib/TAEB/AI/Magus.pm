@@ -1409,6 +1409,7 @@ sub would_sacrifice {
 
     return if $self->want_food($corpse);
     return if !$corpse->should_sacrifice;
+    return if $corpse->cost;
 
     if ($prospective) {
         return if $corpse->monster ne 'acid blob'
