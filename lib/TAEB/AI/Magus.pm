@@ -994,6 +994,9 @@ sub want_goody {
     return 1 if $item->has_tracker
              && $item->tracker->includes_possibility('magic lamp');
 
+    return 1 if $item->match('cloak of magic resistance')
+             && !TAEB->inventory->find('cloak of magic resistance');
+
     return 0;
 }
 
