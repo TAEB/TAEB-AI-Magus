@@ -64,7 +64,8 @@ sub next_queued_action {
         weaken($magus);
 
         my $wrapper = sub {
-            $next->($magus, @_);
+            my ($name, $crap, @args) = @_;
+            $next->($magus, $name, @args);
         };
 
         TAEB->publisher->subscribe($wrapper);
