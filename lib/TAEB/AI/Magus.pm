@@ -538,16 +538,12 @@ sub _wear_type {
     return if $best->is_worn;
 
     my @steps;
-    for my $blocker (@blockers) {
-        push @steps, TAEB::Action::Remove->new(
-            item => TAEB->equipment->$blocker,
-        );
-    }
-
-    if (TAEB->equipment->$subtype) {
-        push @steps, TAEB::Action::Remove->new(
-            item => TAEB->equipment->$subtype,
-        );
+    for my $blocker (@blockers, $subtype) {
+        if (TAEB->equipment->$blocker) {
+            push @steps, TAEB::Action::Remove->new(
+                item => TAEB->equipment->$blocker,
+            );
+        }
     }
 
     push @steps, TAEB::Action::Wear->new(
