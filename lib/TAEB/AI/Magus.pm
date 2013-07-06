@@ -1286,6 +1286,7 @@ sub if_adjacent {
     return if !$tile;
 
     $action = $action->($tile, $direction) if ref($action);
+    return if !$action;
 
     my $action_class = "TAEB::Action::\u$action";
 
