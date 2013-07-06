@@ -389,7 +389,12 @@ sub buff_enchant_armor {
         is_cursed => 0,
     ) or return;
 
-    # XXX make sure our armor's lined up right...
+    for my $slot (TAEB->equipment->armor_slots) {
+        my $equip = TAEB->equipment->get($slot)
+            or next;
+        return if !$equip->enchantment_known;
+        return if $equip->numeric_enchantment >= 4;
+    }
 
     return dip_bless($scroll) || TAEB::Action::Read->new(
         item => $scroll,
