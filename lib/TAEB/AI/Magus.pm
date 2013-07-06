@@ -585,7 +585,7 @@ sub wear_gloves {
 sub wear_1_shirt {
     my $self = shift;
     $self->_wear_type(
-        subtype => 'shirt',
+        subtype  => 'shirt',
         blockers => ['cloak', 'bodyarmor'],
     );
 }
@@ -593,8 +593,8 @@ sub wear_1_shirt {
 sub wear_2_bodyarmor {
     my $self = shift;
     $self->_wear_type(
-        subtype => 'bodyarmor',
-        ideal   => 'silver dragon scale mail',
+        subtype  => 'bodyarmor',
+        ideal    => 'silver dragon scale mail',
         blockers => ['cloak'],
     );
 }
