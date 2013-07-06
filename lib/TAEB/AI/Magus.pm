@@ -590,7 +590,7 @@ sub wear_1_shirt {
     );
 }
 
-sub wear__2_bodyarmor {
+sub wear_2_bodyarmor {
     my $self = shift;
     $self->_wear_type(
         subtype => 'bodyarmor',
