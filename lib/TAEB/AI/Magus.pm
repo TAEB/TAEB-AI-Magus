@@ -533,6 +533,10 @@ sub wrest_wish {
         recharges => 1,
     ) or return;
 
+    # save the wrest for MKoT, when we can handle its damage
+    return if !TAEB->seen_artifact('Master Key of Thievery')
+           && TAEB->hp <= 25;
+
     return TAEB::Action::Zap->new(
         wand => $wand,
     );
