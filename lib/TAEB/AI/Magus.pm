@@ -1409,6 +1409,15 @@ subscribe query_pickupitems => sub {
     });
 };
 
+subscribe query_enhance => sub {
+    my $self = shift;
+    my $event = shift;
+
+    $event->menu->select(sub {
+        return 1;
+    });
+};
+
 sub would_sacrifice {
     my $self = shift;
     my $corpse = shift;
