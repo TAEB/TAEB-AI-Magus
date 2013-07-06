@@ -71,6 +71,7 @@ our @behaviors = (qw/
     to_goody
     uncurse_goody
     identify_.*
+    wear_.*
     buff_.*
     put_on_pois_res
 
@@ -492,6 +493,117 @@ sub identify_wand {
 
         return TAEB::Action::Engrave->new(engraver => $wand);
     }
+}
+
+sub _wear_type {
+    my $self = shift;
+    my %args = @_;
+
+    my $subtype = $args{subtype};
+    my $ideal = $args{ideal};
+    my @blockers = @{ $args{blockers} || [] };
+
+    return if TAEB->equipment->$subtype
+           && TAEB->equipment->$subtype->is_cursed;
+
+    my @possibilities = TAEB->inventory->find(
+        subtype   => $subtype,
+        is_cursed => 0,
+    ) or return;
+
+    # first, any matches for ideal? (speed boots, helm of brilliance, etc)
+    my $best;
+    if ($ideal) {
+        for my $candidate (@possibilities) {
+            $best = $candidate if $candidate->identity||'' eq $ideal;
+        }
+    }
+
+    # failing that, unknown enchantment
+    if (!$best) {
+        for my $candidate (@possibilities) {
+            $best = $candidate if !$candidate->enchantment_known;
+        }
+    }
+
+    # failing that, best AC
+    if (!$best) {
+        $best = shift @possibilities;
+        for my $candidate (@possibilities) {
+            $best = $candidate if $candidate->ac > $best->ac;
+        }
+    }
+
+    return unless $best;
+    return if $best->is_worn;
+
+    my @steps;
+    for my $blocker (@blockers) {
+        push @steps, TAEB::Action::Remove->new(
+            item => TAEB->equipment->$blocker,
+        );
+    }
+
+    if (TAEB->equipment->$subtype) {
+        push @steps, TAEB::Action::Remove->new(
+            item => TAEB->equipment->$subtype,
+        );
+    }
+
+    push @steps, TAEB::Action::Wear->new(
+        item => $best,
+    );
+
+    return \@steps;
+}
+
+sub wear_boots {
+    my $self = shift;
+    $self->_wear_type(
+        subtype => 'boots',
+        ideal   => 'speed boots',
+    );
+}
+
+sub wear_helmet {
+    my $self = shift;
+    $self->_wear_type(
+        subtype => 'helmet',
+        ideal   => 'helm of brilliance',
+    );
+}
+
+sub wear_gloves {
+    my $self = shift;
+    $self->_wear_type(
+        subtype => 'gloves',
+        ideal   => 'gauntlets of dexterity',
+    );
+}
+
+sub wear_1_shirt {
+    my $self = shift;
+    $self->_wear_type(
+        subtype => 'shirt',
+        blockers => ['cloak', 'bodyarmor'],
+    );
+}
+
+sub wear__2_bodyarmor {
+    my $self = shift;
+    $self->_wear_type(
+        subtype => 'bodyarmor',
+        ideal   => 'silver dragon scale mail',
+        blockers => ['cloak'],
+    );
+}
+
+sub wear_3_cloak {
+    my $self = shift;
+    $self->_wear_type(
+        subtype => 'cloak',
+        ideal   => 'cloak of magic resistance',
+    );
 }
 
 sub pray {
