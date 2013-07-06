@@ -99,6 +99,8 @@ our @behaviors = (qw/
     search
 /);
 
+our @METHODS;
+
 sub next_action {
     my $self = shift;
 
@@ -108,10 +110,8 @@ sub next_action {
         return $queued;
     }
 
-    my @methods = __PACKAGE__->meta->get_all_method_names;
-
     for my $behavior (@behaviors) {
-        for my $method (grep { /^$behavior$/ } @methods) {
+        for my $method (grep { /^$behavior$/ } @METHODS) {
             my $action = $self->$method
                 or next;
 
@@ -1596,6 +1596,8 @@ subscribe got_item => sub {
         TAEB->log->ai("No handler for wish $last_wish!", level => "error");
     }
 };
+
+@METHODS = sort __PACKAGE__->meta->get_all_method_names;
 
 1;
 
