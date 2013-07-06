@@ -1054,7 +1054,19 @@ sub open_door {
 }
 
 sub to_door {
-    path_to('closeddoor', include_endpoints => 1);
+    return unless TAEB->current_level->has_type('closeddoor');
+
+    path_to(sub {
+        my $tile = shift;
+
+        return unless $tile->type eq 'closeddoor';
+
+        if ($tile->is_locked && TAEB->current_level->is_minetown) {
+            return;
+        }
+
+        return 2;
+    }, include_endpoints => 1);
 }
 
 sub oracle_statues {
