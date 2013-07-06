@@ -87,7 +87,6 @@ our @behaviors = (qw/
     oracle_statues
 
     practice_spells
-    burden_drop
 
     explore
 
@@ -130,22 +129,6 @@ sub next_action {
 
     $self->currently('to_search');
     return $self->to_search;
-}
-
-sub burden_drop {
-    return if TAEB->burden eq 'Unburdened';
-
-    my @drop = (
-        (grep { TAEB->find_spell($_->spell) } TAEB->inventory->find(
-            type => 'spellbook',
-        )),
-        (grep { $_->has_tracker && $_->tracker->is_nomessage } TAEB->inventory->find(
-            type => 'wand',
-        )),
-    );
-
-    return unless @drop;
-    return TAEB::Action::Drop->new(items => \@drop);
 }
 
 sub put_on_regen {
