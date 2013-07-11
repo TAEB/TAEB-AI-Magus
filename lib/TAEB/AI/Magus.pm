@@ -487,6 +487,17 @@ sub buff_speed_monster {
     );
 }
 
+sub buff_genocide {
+    my $scroll = TAEB->inventory->find(
+        identity  => 'scroll of genocide',
+        is_cursed => 0,
+    ) or return;
+
+    return dip_bless($scroll) || TAEB::Action::Read->new(
+        item => $scroll,
+    );
+}
+
 sub identify_wand {
     return unless TAEB::Action::Engrave->is_advisable;
 
@@ -1461,6 +1472,31 @@ sub stay_on_level {
              && !TAEB->seen_artifact('Magicbane');
 
     return 0;
+}
+
+my @species_genocides = (
+    'chameleon',
+    'minotaur',
+    'soldier ant',
+    'leocrotta',
+    'disenchanter',
+);
+
+my @class_genocides = (
+    'a',
+    'n',
+    'L',
+    'h',
+    ';',
+    'T',
+);
+
+sub respond_genocide_species {
+    return shift(@species_genocides) . "\n";
+}
+
+sub respond_genocide_class {
+    return shift(@class_genocides) . "\n";
 }
 
 my @wishes = (
