@@ -944,6 +944,7 @@ sub eat_tile_food {
 
     for my $food (grep { $_->type eq 'food' } TAEB->current_tile->items) {
         next unless $food->is_safely_edible(distance => 0);
+        next if $food->cost;
 
         return TAEB::Action::Eat->new(food => $food);
     }
