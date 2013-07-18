@@ -1671,6 +1671,47 @@ subscribe got_item => sub {
     }
 };
 
+sub botl_modes {
+    magus => {
+        description => __PACKAGE__,
+        botl => sub {
+            my $currently = TAEB->currently;
+            $currently =~ s/_/ /g;
+            $currently = '' if $currently eq '?';
+            return $currently;
+        },
+        status => sub {
+            my @pieces;
+
+            push @pieces, 'H:' . TAEB->hp
+                if TAEB->hp < TAEB->maxhp;
+
+            push @pieces, 'P:' . TAEB->power
+                if TAEB->power < TAEB->maxpower;
+
+            push @pieces, 'N:' . TAEB->nutrition
+                if TAEB->nutrition < 200;
+
+            push @pieces, 'A:' . TAEB->ac;
+            push @pieces, 'X' . TAEB->level;
+
+            push @pieces, 'T:' . TAEB->turn;
+
+            push @pieces, 'S:' . TAEB->score
+                if TAEB->has_score;
+
+            my $status = join ' ', @pieces;
+
+            # time on the RHS
+            my $time = TAEB->display->step_time;
+            $status .= ' ' x (80 - length($status) - length($time));
+            $status .= $time;
+
+            return $status;
+        },
+    },
+}
+
 @METHODS = sort __PACKAGE__->meta->get_all_method_names;
 
 1;
