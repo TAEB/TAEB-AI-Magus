@@ -1701,6 +1701,31 @@ sub botl_modes {
             push @pieces, 'S:' . TAEB->score
                 if TAEB->has_score;
 
+            my @special;
+            push @special, 'R'
+                if TAEB->equipment->is_wearing_ring("ring of regeneration");
+            push @special, 'C'
+                if TAEB->equipment->is_wearing_ring("ring of conflict");
+            push @special, 'SD'
+                if TAEB->equipment->is_wearing_ring("ring of slow digestion");
+
+            push @special, 'PR'
+                if TAEB->equipment->is_wearing_ring("ring of poison resistance");
+
+            push @special, 'SM'
+                if TAEB->current_tile # :(
+                && TAEB->current_tile->find_item("scroll of scare monster");
+
+            if (TAEB->senses->is_very_fast) {
+                push @special, 'VF';
+            }
+            elsif (TAEB->senses->is_fast) {
+                push @special, 'F';
+            }
+
+            push @pieces, '[' . (join ' ', @special) . ']'
+                if @special;
+
             my $status = join ' ', @pieces;
 
             # time on the RHS
