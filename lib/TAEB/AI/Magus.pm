@@ -1681,6 +1681,8 @@ sub botl_modes {
             return $currently;
         },
         status => sub {
+            my $self = TAEB->ai;
+
             my @pieces;
 
             push @pieces, 'H:' . TAEB->hp
@@ -1689,8 +1691,7 @@ sub botl_modes {
             push @pieces, 'P:' . TAEB->power
                 if TAEB->power < TAEB->maxpower;
 
-            push @pieces, 'N:' . TAEB->nutrition
-                if TAEB->nutrition < 200;
+            push @pieces, 'N:' . TAEB->nutrition . '+' . $self->carried_nutrition;
 
             push @pieces, 'A:' . TAEB->ac;
             push @pieces, 'X' . TAEB->level;
