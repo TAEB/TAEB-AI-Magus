@@ -498,6 +498,33 @@ sub buff_genocide {
     );
 }
 
+sub buff_make_enemies {
+    return unless TAEB->hp == TAEB->maxhp
+               && TAEB->power == TAEB->maxpower;
+    return if TAEB->current_level->has_enemies;
+
+    my $wand = TAEB->inventory->find(
+        identity => 'wand of create monster',
+        charges  => [ undef, sub { $_ > 0 } ],
+    );
+    if ($wand) {
+        return TAEB::Action::Zap->new(
+            wand => $wand,
+        );
+    }
+
+    my $scroll = TAEB->inventory->find(
+        identity => 'scroll of create monster',
+    );
+    if ($scroll) {
+        return TAEB::Action::Read->new(
+            item => $scroll,
+        );
+    }
+
+    return;
+}
+
 sub identify_wand {
     return unless TAEB::Action::Engrave->is_advisable;
 
