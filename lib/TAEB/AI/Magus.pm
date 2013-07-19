@@ -52,7 +52,6 @@ our @behaviors = (qw/
     melee
     single_bolt
     put_on_regen
-    take_off_regen
     wait_scare_monster
     hunt
 
@@ -67,13 +66,16 @@ our @behaviors = (qw/
     eat_inventory
     eat_tile_food
 
-    to_unknown_items
-    to_goody
     uncurse_goody
     identify_.*
     wear_.*
     buff_.*
     put_on_pois_res
+
+    take_off_regen
+
+    to_unknown_items
+    to_goody
 
     sacrifice_here
     shed_carcass
