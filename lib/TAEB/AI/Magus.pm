@@ -498,10 +498,11 @@ sub buff_genocide {
     );
 }
 
-sub buff_make_enemies {
+sub buff_make_eventual_corpses {
     return unless TAEB->hp == TAEB->maxhp
                && TAEB->power == TAEB->maxpower;
     return if TAEB->current_level->has_enemies;
+    return if TAEB->nutrition > 500;
 
     my $wand = TAEB->inventory->find(
         identity => 'wand of create monster',
