@@ -499,6 +499,8 @@ sub buff_genocide {
 }
 
 sub buff_make_eventual_corpses {
+    my $self = shift;
+
     return unless TAEB->hp == TAEB->maxhp
                && TAEB->power == TAEB->maxpower;
     return if TAEB->current_level->has_enemies;
@@ -509,6 +511,9 @@ sub buff_make_eventual_corpses {
         charges  => [ undef, sub { $_ > 0 } ],
     );
     if ($wand) {
+        my $regen = $self->put_on_regen;
+        return $regen if $regen;
+
         return TAEB::Action::Zap->new(
             wand => $wand,
         );
@@ -518,6 +523,9 @@ sub buff_make_eventual_corpses {
         identity => 'scroll of create monster',
     );
     if ($scroll) {
+        my $regen = $self->put_on_regen;
+        return $regen if $regen;
+
         return TAEB::Action::Read->new(
             item => $scroll,
         );
