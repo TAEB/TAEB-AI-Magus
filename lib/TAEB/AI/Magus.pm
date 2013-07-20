@@ -566,7 +566,7 @@ sub on_sacable_altar {
     return 1;
 }
 
-sub identify_wand {
+sub identify_1_wand {
     return unless TAEB::Action::Engrave->is_advisable;
 
     for my $wand (TAEB->inventory->find(type => 'wand', identity => undef)) {
@@ -579,6 +579,51 @@ sub identify_wand {
 
         return TAEB::Action::Engrave->new(engraver => $wand);
     }
+}
+
+sub identify_2_via_scroll {
+    my $self = shift;
+
+    my $scroll = TAEB->inventory->find(
+        identity  => 'scroll of identify',
+        is_cursed => 0,
+    ) or return;
+
+    # do I have interesting items to ID?
+    my $should_id = 0;
+    for my $item (TAEB->inventory_items) {
+        if ($self->would_identify($item)) {
+            $should_id = 1;
+            last;
+        }
+    }
+
+    return if !$should_id;
+
+    return dip_bless($scroll) || TAEB::Action::Read->new(
+        item => $scroll,
+    );
+}
+
+my %is_cool_type = (
+    amulet    => 1,
+    ring      => 1,
+    scroll    => 1,
+    spellbook => 1,
+    potion    => 1,
+
+    wand      => 0, # wands can be ID'd by engraving
+);
+
+sub would_identify {
+    my $self = shift;
+    my $item = shift;
+
+    return 0 if defined($item->identity);
+
+    return 1 unless $is_cool_type{$item->type};
+
+    return;
 }
 
 sub _wear_type {
