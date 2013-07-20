@@ -77,6 +77,8 @@ our @behaviors = (qw/
     to_unknown_items
     to_goody
 
+    blank_crap
+
     sacrifice_here
     shed_carcass
     to_altar
@@ -565,6 +567,55 @@ sub buff_drop_crap {
     }
 
     return;
+}
+
+sub blank_crap {
+    my $self = shift;
+    return unless TAEB->current_level->has_type('fountain');
+
+    my @crap = TAEB->inventory->find(
+        identity => [
+            'scroll of light',
+            'scroll of confuse monster',
+            'scroll of destroy armor',
+            'scroll of fire',
+            'scroll of food detection',
+            'scroll of gold detection',
+            'scroll of amnesia',
+            'scroll of earth',
+            'scroll of punishment',
+            'scroll of stinking cloud',
+
+            'potion of booze',
+            'potion of fruit juice',
+            'potion of see invisible',
+            'potion of sickness',
+            'potion of confusion',
+            'potion of hallucination',
+            'potion of restore ability',
+            'potion of sleeping',
+            'potion of blindness',
+            'potion of invisibility',
+            'potion of monster detection',
+            'potion of object detection',
+            'potion of levitation',
+            'potion of speed',
+            'potion of acid',
+            'potion of oil',
+            'potion of paralysis',
+        ],
+    );
+
+    return unless @crap;
+
+    if (TAEB->current_tile->type eq 'fountain') {
+        return TAEB::Action::Dip->new(
+            item => $crap[0],
+            into => 'fountain',
+        );
+    }
+
+    path_to('fountain');
 }
 
 sub on_sacable_altar {
