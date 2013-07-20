@@ -67,7 +67,10 @@ our @behaviors = (qw/
     eat_tile_food
 
     uncurse_goody
+
     identify_.*
+    real_identify
+
     wear_.*
     buff_.*
     put_on_pois_res
@@ -635,7 +638,7 @@ sub on_sacable_altar {
     return 1;
 }
 
-sub identify_1_engrave_wand {
+sub identify_engrave_wand {
     return unless TAEB::Action::Engrave->is_advisable;
 
     for my $wand (TAEB->inventory->find(type => 'wand', identity => undef)) {
@@ -659,7 +662,7 @@ sub identify_oil_potion {
     }
 }
 
-sub identify_2_via_identify {
+sub real_identify {
     my $self = shift;
 
     my $spell = TAEB->spells->find("identify");
