@@ -1099,6 +1099,9 @@ sub want_goody {
     return 1 if $item->match('cloak of magic resistance')
              && !TAEB->inventory->find('cloak of magic resistance');
 
+    return 1 if $item->match('unicorn horn')
+             && !TAEB->inventory->find('unicorn horn');
+
     return 0;
 }
 
