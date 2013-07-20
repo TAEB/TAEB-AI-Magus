@@ -584,10 +584,19 @@ sub identify_1_wand {
 sub identify_2_via_scroll {
     my $self = shift;
 
-    my $scroll = TAEB->inventory->find(
-        identity  => 'scroll of identify',
-        is_cursed => 0,
-    ) or return;
+    my $spell = TAEB->spells->find("identify");
+
+    # if we know ID but can't cast it right now, go ahead and wait til we can
+    # again
+    return if $spell && !$spell->castable;
+
+    my $scroll;
+    if (!$spell) {
+        $scroll = TAEB->inventory->find(
+            identity  => 'scroll of identify',
+            is_cursed => 0,
+        ) or return;
+    }
 
     # do I have interesting items to ID?
     my $should_id = 0;
@@ -599,6 +608,10 @@ sub identify_2_via_scroll {
     }
 
     return if !$should_id;
+
+    return TAEB::Action::Cast->new(
+        spell => $spell,
+    ) if $spell;
 
     return dip_bless($scroll) || TAEB::Action::Read->new(
         item => $scroll,
