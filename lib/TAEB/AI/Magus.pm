@@ -255,6 +255,8 @@ sub buff_wield_magicbane {
 }
 
 sub buff_polypotion_spellbook {
+    my $self = shift;
+
     my $polymorph = TAEB->inventory->find("potion of polymorph")
         or return;
 
@@ -265,16 +267,7 @@ sub buff_polypotion_spellbook {
     );
 
     for my $book (@books) {
-        my $identity = $book->identity;
-
-        # don't polymorph unidentified spellbooks
-        next unless $identity;
-
-        # don't polymorph spellbooks we haven't learned yet
-        unless ($identity eq "spellbook of blank paper") {
-            my $spell_name = $book->spell;
-            next unless TAEB->spells->find($spell_name);
-        }
+        next unless $self->spellbook_is_useless($book);
 
         return TAEB::Action::Dip->new(
             item => $book,
@@ -283,6 +276,24 @@ sub buff_polypotion_spellbook {
     }
 
     return;
+}
+
+sub spellbook_is_useless {
+    my $self = shift;
+    my $book = shift;
+
+    my $identity = $book->identity;
+
+    # unidentified spellbooks are always useless
+    return 0 if !$identity;
+
+    return 1 if $identity eq "spellbook of blank paper";
+
+    # spellbooks from which we've already learned are effectively useless
+    my $spell_name = $book->spell;
+    return 1 if TAEB->spells->find($spell_name);
+
+    return 0;
 }
 
 sub buff_polypile_spellbook {
