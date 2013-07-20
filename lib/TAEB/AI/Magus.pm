@@ -538,6 +538,20 @@ sub buff_make_eventual_corpses {
     return;
 }
 
+sub buff_drop_crap {
+    my $self = shift;
+    my @crap;
+
+    my $magicbane = TAEB->inventory->find('Magicbane');
+    push @crap, TAEB->inventory->find(identity => 'quarterstaff');
+
+    if (@crap) {
+        return TAEB::Action::Drop->new(items => \@crap);
+    }
+
+    return;
+}
+
 sub on_sacable_altar {
     my $tile = TAEB->current_tile;
 
