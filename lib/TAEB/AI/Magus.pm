@@ -1243,6 +1243,9 @@ sub want_goody {
     return 1 if $item->match('unicorn horn')
              && !TAEB->inventory->find('unicorn horn');
 
+    return 1 if $item->match(identity => ['blindfold', 'towel'])
+             && !TAEB->inventory->find(identity => ['blindfold', 'towel']);
+
     # any interesting trinkets
     return 1 if $self->would_identify($item);
 
