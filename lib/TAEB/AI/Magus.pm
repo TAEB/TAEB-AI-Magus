@@ -259,6 +259,13 @@ sub buff_wield_magicbane {
     return TAEB::Action::Wield->new(weapon => $magicbane);
 }
 
+sub buff_conserve_oil {
+    my $lit_oil = TAEB->inventory->find(type => "potion", is_lit => 1)
+        or return;
+
+    return TAEB::Action::Apply->new(item => $lit_oil);
+}
+
 sub buff_polypotion_spellbook {
     my $self = shift;
 
