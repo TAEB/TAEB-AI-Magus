@@ -936,7 +936,7 @@ sub recharge_wishing {
 }
 
 sub heal_self {
-    return if TAEB->hp * 2 > TAEB->maxhp;
+    return unless TAEB->hp * 2 < TAEB->maxhp;
 
     my $spell = TAEB->find_castable("extra healing") || TAEB->find_castable("healing");
     if ($spell) {
@@ -946,9 +946,19 @@ sub heal_self {
         );
     }
 
-    # XXX potion
+    return unless TAEB->hp * 3 < TAEB->maxhp;
 
-    return;
+    my $potion = TAEB->inventory->find(
+        identity => [
+            "potion of healing",
+            "potion of extra healing",
+            "potion of full healing",
+        ],
+    ) or return;
+
+    return TAEB::Action::Quaff->new(
+        from => $potion,
+    );
 }
 
 sub multi_bolt {
