@@ -545,6 +545,8 @@ sub buff_drop_crap {
     my $magicbane = TAEB->inventory->find('Magicbane');
     push @crap, TAEB->inventory->find(identity => 'quarterstaff');
 
+    push @crap, TAEB->inventory->find(identity => 'bell', is_artifact => 0);
+
     if (@crap) {
         return TAEB::Action::Drop->new(items => \@crap);
     }
