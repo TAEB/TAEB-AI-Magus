@@ -649,6 +649,16 @@ sub identify_1_engrave_wand {
     }
 }
 
+sub identify_oil_potion {
+    for my $potion (TAEB->inventory->find(type => 'potion', identity => undef)) {
+        next if $potion->cost;
+
+        next unless $potion->tracker->includes_possibility('potion of oil');
+
+        return TAEB::Action::Apply->new(item => $potion);
+    }
+}
+
 sub identify_2_via_identify {
     my $self = shift;
 
