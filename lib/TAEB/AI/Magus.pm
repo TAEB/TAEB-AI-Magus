@@ -377,14 +377,20 @@ sub buff_polypile_spellbook {
     ];
 }
 
-sub buff_1_read_unknown_spellbook {
+sub buff_1_read_new_spellbook {
     my @books = TAEB->inventory->find(
         type      => 'spellbook',
-        identity  => undef,
         is_cursed => 0,
     );
 
     for my $book (@books) {
+        if ($book->identity) {
+            next if $book->identity eq "spellbook of blank paper";
+
+            my $spell_name = $book->spell;
+            next if TAEB->spells->find($spell_name);
+        }
+
         next if $book->difficult_for_level >= TAEB->level
              && $book->difficult_for_int >= TAEB->int;
 
