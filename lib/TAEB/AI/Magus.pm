@@ -682,19 +682,20 @@ sub real_identify {
     }
 
     # do I have interesting items to ID?
-    my $should_id = 0;
+    my @items;
     for my $item (TAEB->inventory_items) {
         if ($self->would_identify($item)) {
-            $should_id = 1;
-            last;
+            push @items, $item;
         }
     }
 
-    return if !$should_id;
+    return if @items;
 
     return TAEB::Action::Cast->new(
         spell => $spell,
     ) if $spell;
+
+    return if @items < 3;
 
     return dip_bless($scroll) || TAEB::Action::Read->new(
         item => $scroll,
