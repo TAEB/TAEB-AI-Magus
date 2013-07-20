@@ -1579,6 +1579,21 @@ subscribe query_pickupitems => sub {
     });
 };
 
+subscribe query_identifyitems => sub {
+    my $self = shift;
+    my $event = shift;
+
+    # first, prefer items we want to identify
+    $event->menu->select(sub {
+        my $item = shift->user_data;
+        return $self->would_identify($item);
+    });
+
+    # next, if needed, just identify anything and everything
+    return if $event->menu->selected_items;
+    $event->menu->select(sub { 1 });
+};
+
 subscribe query_enhance => sub {
     my $self = shift;
     my $event = shift;
