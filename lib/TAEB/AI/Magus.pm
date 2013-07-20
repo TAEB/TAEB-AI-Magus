@@ -566,7 +566,7 @@ sub on_sacable_altar {
     return 1;
 }
 
-sub identify_1_wand {
+sub identify_1_engrave_wand {
     return unless TAEB::Action::Engrave->is_advisable;
 
     for my $wand (TAEB->inventory->find(type => 'wand', identity => undef)) {
@@ -581,7 +581,7 @@ sub identify_1_wand {
     }
 }
 
-sub identify_2_via_scroll {
+sub identify_2_via_identify {
     my $self = shift;
 
     my $spell = TAEB->spells->find("identify");
