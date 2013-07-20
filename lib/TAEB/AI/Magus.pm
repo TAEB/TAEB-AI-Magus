@@ -606,6 +606,12 @@ sub blank_crap {
         ],
     );
 
+    if (TAEB->has_item("magic marker")) {
+        push @crap, grep { $self->spellbook_is_useless($_) }
+                    grep { ($_->identity||"") ne "spellbook of blank paper" }
+                    TAEB->inventory->find(type => "spellbook");
+    }
+
     return unless @crap;
 
     if (TAEB->current_tile->type eq 'fountain') {
