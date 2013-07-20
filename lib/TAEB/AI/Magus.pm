@@ -683,8 +683,7 @@ sub real_identify {
     my $scroll;
     if (!$spell) {
         $scroll = TAEB->inventory->find(
-            identity  => 'scroll of identify',
-            is_cursed => 0,
+            identity => 'scroll of identify',
         ) or return;
     }
 
