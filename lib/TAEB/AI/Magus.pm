@@ -536,6 +536,16 @@ sub buff_make_eventual_corpses {
     return;
 }
 
+sub on_sacable_altar {
+    my $tile = TAEB->current_tile;
+
+    return unless $tile->type eq 'altar';
+
+    return if $tile->in_temple && !$tile->is_coaligned;
+
+    return 1;
+}
+
 sub identify_wand {
     return unless TAEB::Action::Engrave->is_advisable;
 
@@ -1270,9 +1280,7 @@ sub to_search {
 sub sacrifice_here {
     my $self = shift;
 
-    my $tile = TAEB->current_tile;
-    return unless $tile->type eq 'altar';
-    return if $tile->in_temple && !$tile->is_coaligned;
+    return unless $self->on_sacable_altar;
 
     my @corpses = (
         TAEB->inventory->find(subtype => 'corpse'),
