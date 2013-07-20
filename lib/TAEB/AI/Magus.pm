@@ -989,12 +989,14 @@ sub eat_tile_food {
     my $self = shift;
 
     return if TAEB->nutrition > 995;
-    return if $self->offerable_altars && TAEB->nutrition > 100;
     return if TAEB->current_tile->in_shop;
+
+    my $prefer_sac = $self->offerable_altars && TAEB->nutrition > 100;
 
     for my $food (grep { $_->type eq 'food' } TAEB->current_tile->items) {
         next unless $food->is_safely_edible(distance => 0);
         next if $food->cost;
+        next if $prefer_sac && !$self->really_want_food($food);
 
         return TAEB::Action::Eat->new(food => $food);
     }
@@ -1042,6 +1044,28 @@ sub want_food {
     return if $food->cost;
 
     return 1;
+}
+
+sub really_want_food {
+    my $self = shift;
+    my $food = shift;
+
+    if ($food->subtype eq 'corpse') {
+        return 1 if $food->speed_toggle && !TAEB->is_fast;
+        return 1 if $food->telepathy && !TAEB->has_telepathy;
+        return 1 if $food->gain_level;
+        return 1 if $food->intelligence;
+        return 1 if $food->strength;
+        # XXX tele, TC
+    }
+
+    for my $resist (qw/shock poison fire cold sleep disintegration/) {
+        my $prop = "${resist}_resistance";
+        my $res  = "${resist}_resistant";
+        return 1 if $food->$prop && !TAEB->$res;
+    }
+
+    return;
 }
 
 sub want_goody {
