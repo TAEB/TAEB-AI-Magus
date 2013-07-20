@@ -639,8 +639,7 @@ sub identify_1_engrave_wand {
     return unless TAEB::Action::Engrave->is_advisable;
 
     for my $wand (TAEB->inventory->find(type => 'wand', identity => undef)) {
-        my $tracker = $wand->tracker->engrave_useful
-            or next;
+        next unless $wand->tracker->engrave_useful;
 
         if (TAEB->current_tile->engraving eq '') {
             return TAEB::Action::Engrave->new(engraver => '-');
