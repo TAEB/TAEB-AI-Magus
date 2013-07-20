@@ -634,7 +634,7 @@ sub would_identify {
 
     return 0 if defined($item->identity);
 
-    return 1 unless $is_cool_type{$item->type};
+    return 1 if $is_cool_type{$item->type};
 
     return;
 }
