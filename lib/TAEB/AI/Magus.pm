@@ -504,7 +504,7 @@ sub buff_make_eventual_corpses {
     my $self = shift;
 
     return unless TAEB->hp == TAEB->maxhp
-               && TAEB->power == TAEB->maxpower;
+               && TAEB->power > TAEB->maxpower / 3;
     return if TAEB->current_level->has_enemies;
 
     return unless TAEB->nutrition < 500
