@@ -1241,9 +1241,12 @@ sub want_goody {
 
     return if $item->cost;
 
+    # all manner of trinket
+    return 1 if $item->match(type => [keys %is_cool_type]);
+
     return 1 if $item->match('Magicbane');
-    return 1 if $item->type eq 'spellbook';
     return 1 if $item->match('magic marker');
+
     return 1 if $item->has_tracker
              && $item->tracker->includes_possibility('magic lamp');
 
@@ -1255,9 +1258,6 @@ sub want_goody {
 
     return 1 if $item->match(identity => ['blindfold', 'towel'])
              && !TAEB->inventory->find(identity => ['blindfold', 'towel']);
-
-    # any interesting trinkets
-    return 1 if $self->would_identify($item);
 
     return 0;
 }
