@@ -575,6 +575,8 @@ sub buff_drop_crap {
 sub blank_crap {
     my $self = shift;
     return unless TAEB->level >= 5;
+
+    return if TAEB->current_level->is_minetown;
     return unless TAEB->current_level->has_type('fountain');
 
     my @crap = TAEB->inventory->find(
