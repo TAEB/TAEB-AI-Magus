@@ -695,7 +695,7 @@ sub real_identify {
         }
     }
 
-    return if @items;
+    return if !@items;
 
     return TAEB::Action::Cast->new(
         spell => $spell,
