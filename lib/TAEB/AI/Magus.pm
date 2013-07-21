@@ -53,6 +53,7 @@ our @behaviors = (qw/
     single_bolt
     put_on_regen
     put_on_invis
+    put_on_tc
     wait_scare_monster
     hunt
 
@@ -174,6 +175,26 @@ sub put_on_invis {
     return unless TAEB->current_level->has_enemies;
 
     return TAEB::Action::Wear->new(item => $ring);
+}
+
+sub put_on_tc {
+    return unless TAEB->senses->is_teleporting;
+    return if TAEB->senses->has_teleport_control;
+
+    # XXX ideally TAEB would know this
+    return if TAEB->inventory->find("Master Key of Thievery");
+
+    return if TAEB->equipment->left_ring
+           && TAEB->equipment->right_ring;
+    return if TAEB->equipment->is_wearing_ring("ring of teleport control");
+
+    my $ring = TAEB->inventory->find(
+        identity  => 'ring of teleport control',
+        is_cursed => 0,
+    ) or return;
+
+    return TAEB::Action::Wear->new(item => $ring);
+
 }
 
 sub put_on_pois_res {
