@@ -52,6 +52,7 @@ our @behaviors = (qw/
     melee
     single_bolt
     put_on_regen
+    put_on_invis
     wait_scare_monster
     hunt
 
@@ -76,6 +77,7 @@ our @behaviors = (qw/
     put_on_pois_res
 
     take_off_regen
+    take_off_invis
 
     to_unknown_items
     to_goody
@@ -159,6 +161,21 @@ sub put_on_regen {
     return TAEB::Action::Wear->new(item => $ring);
 }
 
+sub put_on_invis {
+    return if TAEB->equipment->left_ring
+           && TAEB->equipment->right_ring;
+    return if TAEB->equipment->is_wearing_ring("ring of invisibility");
+
+    my $ring = TAEB->inventory->find(
+        identity  => 'ring of invisibility',
+        is_cursed => 0,
+    ) or return;
+
+    return unless TAEB->current_level->has_enemies;
+
+    return TAEB::Action::Wear->new(item => $ring);
+}
+
 sub put_on_pois_res {
     return if TAEB->senses->poison_resistant;
     return if TAEB->equipment->left_ring
@@ -204,6 +221,15 @@ sub take_off_regen {
     return if TAEB->hp < TAEB->maxhp;
 
     my $ring = TAEB->equipment->is_wearing_ring("ring of regeneration")
+        or return;
+
+    return if TAEB->current_level->has_enemies;
+
+    return TAEB::Action::Remove->new(item => $ring);
+}
+
+sub take_off_invis {
+    my $ring = TAEB->equipment->is_wearing_ring("ring of invisibility")
         or return;
 
     return if TAEB->current_level->has_enemies;
