@@ -194,7 +194,6 @@ sub put_on_tc {
     ) or return;
 
     return TAEB::Action::Wear->new(item => $ring);
-
 }
 
 sub put_on_pois_res {
@@ -1257,12 +1256,15 @@ sub eat_tile_food {
 sub to_food {
     my $self = shift;
     return if $self->carried_nutrition > 3000;
-    return unless any { $_->type eq 'food' } TAEB->current_level->items;
+    return unless any { $self->want_food($_) }
+                  grep { $_->type eq 'food' }
+                  TAEB->current_level->items;
 
     path_to(sub {
         my $tile = shift;
-        my @items = $tile->items;
-        return any { $self->want_food($_) } grep { $_->type eq 'food' } @items;
+        return any { $self->want_food($_) }
+               grep { $_->type eq 'food' }
+               $tile->items;
     });
 }
 
