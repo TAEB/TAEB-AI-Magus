@@ -2027,6 +2027,9 @@ sub botl_modes {
                 push @special, 'F';
             }
 
+            push @special, 'I'
+                if TAEB->senses->is_invisible;
+
             push @pieces, '[' . (join ' ', @special) . ']'
                 if @special;
 
