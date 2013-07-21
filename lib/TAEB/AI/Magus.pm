@@ -669,7 +669,7 @@ sub identify_engrave_wand {
 
 sub identify_oil_potion {
     for my $potion (TAEB->inventory->find(type => 'potion', identity => undef)) {
-        next if $potion->cost;
+        next if $potion->total_cost;
 
         next unless $potion->tracker->includes_possibility('potion of oil');
 
@@ -1177,7 +1177,7 @@ sub eat_tile_food {
 
     for my $food (grep { $_->type eq 'food' } TAEB->current_tile->items) {
         next unless $food->is_safely_edible(distance => 0);
-        next if $food->cost;
+        next if $food->total_cost;
         next if $prefer_sac && !$self->really_want_food($food);
 
         return TAEB::Action::Eat->new(food => $food);
@@ -1223,7 +1223,7 @@ sub want_food {
     return unless $food->type eq 'food';
     return unless $food->is_safely_edible;
     return if $food->subtype eq 'corpse' && !$food->permanent;
-    return if $food->cost;
+    return if $food->total_cost;
 
     return 1;
 }
@@ -1254,7 +1254,7 @@ sub want_goody {
     my $self = shift;
     my $item = shift;
 
-    return if $item->cost;
+    return if $item->total_cost;
 
     # all manner of trinket
     return 1 if $item->match(type => [keys %is_cool_type]);
@@ -1668,7 +1668,7 @@ sub attack_spell {
 }
 
 sub carried_nutrition {
-    (sum map { $_->quantity * $_->nutrition } TAEB->inventory->find(type => "food")) || 0;
+    (sum map { $_->total_nutrition } TAEB->inventory->find(type => "food")) || 0;
 }
 
 subscribe query_pickupitems => sub {
@@ -1721,7 +1721,7 @@ sub would_sacrifice {
 
     return if $self->want_food($corpse);
     return if !$corpse->should_sacrifice;
-    return if $corpse->cost;
+    return if $corpse->total_cost;
 
     if ($prospective) {
         return if $corpse->monster ne 'acid blob'
