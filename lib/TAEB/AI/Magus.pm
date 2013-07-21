@@ -1216,6 +1216,17 @@ sub eat_tile_food {
         next if $food->total_cost;
         next if $prefer_sac && !$self->really_want_food($food);
 
+        if ($food->teleportitis) {
+            next unless TAEB->senses->is_teleporting
+                     || TAEB->senses->has_teleport_control
+                     || TAEB->inventory->find(
+                            identity  => 'ring of teleport control',
+                            is_cursed => 0,
+                        )
+                     # XXX ideally TAEB would know this
+                     || TAEB->inventory->find("Master Key of Thievery");
+        }
+
         return TAEB::Action::Eat->new(food => $food);
     }
 
