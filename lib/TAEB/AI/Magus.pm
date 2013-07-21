@@ -562,6 +562,16 @@ sub buff_make_eventual_corpses {
                && TAEB->power > TAEB->maxpower / 3;
     return if TAEB->current_level->has_enemies;
 
+    my $spell = TAEB->find_castable("create monster");
+    if ($spell && $spell->fail < 50) {
+        my $regen = $self->put_on_regen;
+        return $regen if $regen;
+
+        return TAEB::Action::Cast->new(
+            spell => $spell,
+        );
+    }
+
     return unless TAEB->nutrition < 500
                || $self->on_sacable_altar;
 
