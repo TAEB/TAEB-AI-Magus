@@ -83,13 +83,13 @@ our @behaviors = (qw/
     to_unknown_items
     to_goody
 
-    blank_crap
-
     sacrifice_here
     shed_carcass
     to_altar
     pickup_sac
     to_sac
+
+    blank_crap
 
     open_door
     to_door
