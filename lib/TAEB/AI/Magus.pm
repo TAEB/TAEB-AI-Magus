@@ -916,6 +916,21 @@ sub pray {
         return;
     }
 
+    if (TAEB->current_tile->type eq 'altar') {
+        my @water;
+        push @water, TAEB->inventory->find(
+            identity   => 'potion of water',
+            is_uncursed => 1,
+        );
+        push @water, TAEB->inventory->find(
+            identity   => 'potion of water',
+            buc      => undef,
+        );
+        return TAEB::Action::Drop->new(
+            items => \@water,
+        ) if @water;
+    }
+
     return TAEB::Action::Pray->new;
 }
 
