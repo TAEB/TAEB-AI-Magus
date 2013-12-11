@@ -14,4 +14,4 @@ He can:
 * abuse bounce trajectories for magic missile, etc.
 * destroy Oracle statues for potential spellbooks
 * practice spells for #enhance
-
+* make holy water and bless/uncurse beneficial items using it
