@@ -306,6 +306,8 @@ sub buff_wield_magicbane {
 }
 
 sub buff_write_scroll {
+    my $self = shift;
+
     my $marker = TAEB->inventory->find(
         identity => "magic marker",
         charges  => [ undef, sub { $_ > 0 } ],
@@ -318,11 +320,26 @@ sub buff_write_scroll {
     );
     return unless $scroll;
 
-    return TAEB::Action::Write->new(
-        marker   => $marker,
-        identity => 'identify',
-        onto     => $scroll,
-    );
+    my $write = sub {
+        return TAEB::Action::Write->new(
+            marker   => $marker,
+            identity => shift,
+            onto     => $scroll,
+        );
+    };
+
+    return $write->('enchant armor')
+        if TAEB->has_identified("scroll of enchant armor")
+        && $self->can_enchant_armor;
+
+    return $write->('enchant weapon')
+        if TAEB->has_identified("scroll of enchant weapon")
+        && $self->can_enchant_weapon;
+
+    return $write->('identify')
+        if TAEB->has_identified("scroll of identify");
+
+    return;
 }
 
 sub buff_conserve_oil {
