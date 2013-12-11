@@ -1313,9 +1313,7 @@ sub eat_tile_food {
                      || TAEB->inventory->find(
                             identity  => 'ring of teleport control',
                             is_cursed => 0,
-                        )
-                     # XXX ideally TAEB would know this
-                     || TAEB->inventory->find("Master Key of Thievery");
+                        );
         }
 
         return TAEB::Action::Eat->new(food => $food);
