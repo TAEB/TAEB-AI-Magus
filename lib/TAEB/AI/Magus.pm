@@ -467,15 +467,23 @@ sub buff_1_read_new_spellbook {
     return;
 }
 
+sub can_enchant_weapon {
+    my $weapon = TAEB->equipment->weapon or return 0;
+
+    return 0 if ($weapon->numeric_enchantment||0) > 5;
+
+    return 1;
+}
+
 sub buff_enchant_weapon {
+    my $self = shift;
+
     my $scroll = TAEB->inventory->find(
         identity  => 'scroll of enchant weapon',
         is_cursed => 0,
     ) or return;
 
-    my $weapon = TAEB->equipment->weapon or return;
-
-    return if ($weapon->numeric_enchantment||0) > 5;
+    return unless $self->can_enchant_weapon;
 
     return dip_bless($scroll) || TAEB::Action::Read->new(
         item => $scroll,
