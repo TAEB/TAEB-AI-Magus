@@ -7,12 +7,12 @@ He can:
 * altar camp for Magicbane
 * effectively use an entire wand of wishing, starting with charging
 * polypile spellbooks and read them
-* use rings of regeneration and conflict tactically
+* tactically use rings of regeneration, conflict, invisibility, etc.
 * identify items using scroll and spell, and other tricks (like applying oil)
 * use all manner of spell, scroll, ring, and wand
+* write scrolls with a marker
 * blank useless potions, scrolls, and spellbooks
 * abuse bounce trajectories for magic missile, etc.
 * destroy Oracle statues for potential spellbooks
 * practice spells for #enhance
 * make holy water and bless/uncurse beneficial items using it
-* write scroll of identify with a marker
