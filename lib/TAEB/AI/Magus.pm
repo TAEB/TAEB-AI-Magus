@@ -182,12 +182,8 @@ sub put_on_tc {
     return unless TAEB->senses->is_teleporting;
     return if TAEB->senses->has_teleport_control;
 
-    # XXX ideally TAEB would know this
-    return if TAEB->inventory->find("Master Key of Thievery");
-
     return if TAEB->equipment->left_ring
            && TAEB->equipment->right_ring;
-    return if TAEB->equipment->is_wearing_ring("ring of teleport control");
 
     my $ring = TAEB->inventory->find(
         identity  => 'ring of teleport control',
