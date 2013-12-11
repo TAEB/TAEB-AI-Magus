@@ -336,6 +336,12 @@ sub buff_write_scroll {
         if TAEB->has_identified("scroll of enchant weapon")
         && $self->can_enchant_weapon;
 
+    return $write->('genocide')
+        if TAEB->has_identified("scroll of genocide");
+
+    return $write->('magic mapping')
+        if TAEB->has_identified("scroll of magic mapping");
+
     return $write->('identify')
         if TAEB->has_identified("scroll of identify");
 
