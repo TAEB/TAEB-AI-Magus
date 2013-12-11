@@ -179,7 +179,7 @@ sub put_on_invis {
 }
 
 sub put_on_tc {
-    return unless TAEB->senses->is_teleporting;
+    return unless TAEB->senses->has_teleportitis;
     return if TAEB->senses->has_teleport_control;
 
     return if TAEB->equipment->left_ring
@@ -1308,7 +1308,7 @@ sub eat_tile_food {
         next if $prefer_sac && !$self->really_want_food($food);
 
         if ($food->subtype eq 'corpse' && $food->teleportitis) {
-            next unless TAEB->senses->is_teleporting
+            next unless TAEB->senses->has_intrinsic_teleportitis
                      || TAEB->senses->has_teleport_control
                      || TAEB->inventory->find(
                             identity  => 'ring of teleport control',
