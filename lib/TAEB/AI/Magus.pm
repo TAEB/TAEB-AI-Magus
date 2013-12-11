@@ -80,8 +80,9 @@ our @behaviors = (qw/
     take_off_regen
     take_off_invis
 
-    to_unknown_items
     to_goody
+    to_good_unknown_items
+    to_unknown_items
 
     sacrifice_here
     shed_carcass
@@ -1419,6 +1420,30 @@ sub want_goody {
              && !TAEB->inventory->find(identity => ['blindfold', 'towel']);
 
     return 0;
+}
+
+my %is_good_unknown = map { $_ => 1 } (
+    '/',
+    '?',
+    '!',
+    '=',
+    '"',
+    '+',
+);
+
+sub to_good_unknown_items {
+    return unless TAEB->current_level->has_type('unknown_items');
+    my @tiles = TAEB->current_level->tiles_of('unknown_items');
+
+    return unless any {
+        my $tile = shift;
+        $tile->has_unknown_items && $is_good_unknown{$tile->glyph}
+    } @tiles;
+
+    path_to(sub {
+        my $tile = shift;
+        $tile->has_unknown_items && $is_good_unknown{$tile->glyph}
+    });
 }
 
 sub to_unknown_items {
