@@ -490,18 +490,26 @@ sub buff_enchant_weapon {
     );
 }
 
+sub can_enchant_armor {
+    for my $slot (TAEB->equipment->armor_slots) {
+        my $equip = TAEB->equipment->$slot
+            or next;
+        return 0 if !$equip->enchantment_known;
+        return 0 if $equip->numeric_enchantment >= 4;
+    }
+
+    return 1;
+}
+
 sub buff_enchant_armor {
+    my $self = shift;
+
     my $scroll = TAEB->inventory->find(
         identity  => 'scroll of enchant armor',
         is_cursed => 0,
     ) or return;
 
-    for my $slot (TAEB->equipment->armor_slots) {
-        my $equip = TAEB->equipment->$slot
-            or next;
-        return if !$equip->enchantment_known;
-        return if $equip->numeric_enchantment >= 4;
-    }
+    return unless $self->can_enchant_armor;
 
     return dip_bless($scroll) || TAEB::Action::Read->new(
         item => $scroll,
