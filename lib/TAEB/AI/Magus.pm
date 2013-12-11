@@ -1,7 +1,7 @@
 package TAEB::AI::Magus;
 use Moose;
 use TAEB::OO;
-use TAEB::Util qw/uniq all any sum refaddr/;
+use TAEB::Util qw/uniq all any sum refaddr first/;
 extends 'TAEB::AI';
 
 use TAEB::AI::Magus::GoalManager;
@@ -303,6 +303,26 @@ sub buff_wield_magicbane {
     return if $magicbane->is_wielded;
 
     return TAEB::Action::Wield->new(weapon => $magicbane);
+}
+
+sub buff_write_scroll {
+    my $marker = TAEB->inventory->find(
+        identity => "magic marker",
+        charges  => [ undef, sub { $_ > 0 } ],
+    ) or return;
+
+    my $scroll = first { defined } (
+        TAEB->inventory->find("scroll of blank paper", is_blessed => 1),
+        TAEB->inventory->find("scroll of blank paper", is_uncursed => 1),
+        TAEB->inventory->find("scroll of blank paper", is_cursed => 0),
+    );
+    return unless $scroll;
+
+    return TAEB::Action::Write->new(
+        marker   => $marker,
+        identity => 'identify',
+        onto     => $scroll,
+    );
 }
 
 sub buff_conserve_oil {
