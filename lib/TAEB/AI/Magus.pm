@@ -1585,6 +1585,15 @@ sub practice_spells {
         || $self->practice_nodir("clairvoyance")
         || $self->practice_nodir("confuse monster")
         || $self->practice_nodir("cause fear")
+
+        || $self->practice_self("healing")
+        || $self->practice_self("extra healing")
+
+        || $self->practice_down("drain life")
+        || $self->practice_down("slow monster")
+        || $self->practice_down("knock")
+        || $self->practice_down("wizard lock")
+
         || $self->practice_force_bolt;
 }
 
@@ -1596,6 +1605,32 @@ sub practice_nodir {
         or return;
 
     return TAEB::Action::Cast->new(spell => $spell);
+}
+
+sub practice_self {
+    my $self = shift;
+    my $name = shift;
+
+    my $spell = TAEB->find_castable($name)
+        or return;
+
+    return TAEB::Action::Cast->new(
+        spell     => $spell,
+        direction => '.',
+    );
+}
+
+sub practice_down {
+    my $self = shift;
+    my $name = shift;
+
+    my $spell = TAEB->find_castable($name)
+        or return;
+
+    return TAEB::Action::Cast->new(
+        spell     => $spell,
+        direction => '>',
+    );
 }
 
 sub practice_force_bolt {
