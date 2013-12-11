@@ -1568,81 +1568,50 @@ sub practice_spells {
     return if TAEB->power < 20;
     return if TAEB->power < TAEB->maxpower;
 
-    return $self->practice_nodir("haste self")
-        || $self->practice_nodir("identify")
-        || $self->practice_nodir("remove curse")
-        || $self->practice_nodir("charm monster")
-        || $self->practice_nodir("protection")
-        || $self->practice_nodir("light")
-        || $self->practice_nodir("detect monsters")
-        || $self->practice_nodir("detect unseen")
-        || $self->practice_nodir("detect treasure")
-        || $self->practice_nodir("magic mapping")
-        || $self->practice_nodir("cure blindness")
-        || $self->practice_nodir("cure sickness")
-        || $self->practice_nodir("restore ability")
-        || $self->practice_nodir("detect food")
-        || $self->practice_nodir("clairvoyance")
-        || $self->practice_nodir("confuse monster")
-        || $self->practice_nodir("cause fear")
+    return $self->practice_spell("haste self")
+        || $self->practice_spell("identify")
+        || $self->practice_spell("remove curse")
+        || $self->practice_spell("charm monster")
+        || $self->practice_spell("protection")
+        || $self->practice_spell("light")
+        || $self->practice_spell("detect monsters")
+        || $self->practice_spell("detect unseen")
+        || $self->practice_spell("detect treasure")
+        || $self->practice_spell("magic mapping")
+        || $self->practice_spell("cure blindness")
+        || $self->practice_spell("cure sickness")
+        || $self->practice_spell("restore ability")
+        || $self->practice_spell("detect food")
+        || $self->practice_spell("clairvoyance")
+        || $self->practice_spell("confuse monster")
+        || $self->practice_spell("cause fear")
 
-        || $self->practice_self("healing")
-        || $self->practice_self("extra healing")
+        || $self->practice_spell("healing",       direction => '.')
+        || $self->practice_spell("extra healing", direction => '.')
 
-        || $self->practice_down("drain life")
-        || $self->practice_down("slow monster")
-        || $self->practice_down("knock")
-        || $self->practice_down("wizard lock")
+        || $self->practice_down("drain life",   direction => '>')
+        || $self->practice_down("slow monster", direction => '>')
+        || $self->practice_down("knock",        direction => '>')
+        || $self->practice_down("wizard lock",  direction => '>')
 
-        || $self->practice_force_bolt;
+        || $self->practice_down("stone to flesh", avoid_items => 1, direction => '>');
+        || $self->practice_down("polymorph",      avoid_items => 1, direction => '>');
+        || $self->practice_down("cancellation",   avoid_items => 1, direction => '>');
+        || $self->practice_down("force bolt",     avoid_items => 1, direction => '>');
 }
 
-sub practice_nodir {
+sub practice_spell {
     my $self = shift;
     my $name = shift;
+    my %args = @_;
 
     my $spell = TAEB->find_castable($name)
         or return;
 
-    return TAEB::Action::Cast->new(spell => $spell);
-}
-
-sub practice_self {
-    my $self = shift;
-    my $name = shift;
-
-    my $spell = TAEB->find_castable($name)
-        or return;
-
+    return if delete($args{avoid_items}) && TAEB->current_tile->items;
     return TAEB::Action::Cast->new(
-        spell     => $spell,
-        direction => '.',
-    );
-}
-
-sub practice_down {
-    my $self = shift;
-    my $name = shift;
-
-    my $spell = TAEB->find_castable($name)
-        or return;
-
-    return TAEB::Action::Cast->new(
-        spell     => $spell,
-        direction => '>',
-    );
-}
-
-sub practice_force_bolt {
-    my $force_bolt = TAEB->find_castable("force bolt")
-        or return;
-
-    # don't break the items on the ground
-    return if TAEB->current_tile->items;
-
-    return TAEB::Action::Cast->new(
-        spell     => $force_bolt,
-        direction => '>',
+        spell => $spell,
+        %args,
     );
 }
 
