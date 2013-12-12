@@ -107,6 +107,8 @@ our @behaviors = (qw/
 
     hang_around_altar
 
+    destroy_boulders
+
     magic_map
     search
 /);
@@ -1644,6 +1646,24 @@ sub hang_around_altar {
         if $is_offerable{refaddr(TAEB->current_tile)};
 
     path_to(sub { $is_offerable{ refaddr shift } });
+}
+
+sub destroy_boulders {
+    my $spell = TAEB->find_castable("force bolt")
+        or return;
+
+    my ($tile, $direction) = find_adjacent(sub { shift->has_boulder });
+    if ($tile) {
+        return TAEB::Action::Cast->new(
+            spell     => $spell,
+            direction => $direction,
+        );
+    }
+
+    path_to(
+        sub { $_[0]->has_boulder },
+        include_endpoints => 1,
+    );
 }
 
 sub search {
