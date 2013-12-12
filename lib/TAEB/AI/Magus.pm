@@ -1582,15 +1582,15 @@ sub practice_spells {
         || $self->practice_spell("healing",       direction => '.')
         || $self->practice_spell("extra healing", direction => '.')
 
-        || $self->practice_down("drain life",   direction => '>')
-        || $self->practice_down("slow monster", direction => '>')
-        || $self->practice_down("knock",        direction => '>')
-        || $self->practice_down("wizard lock",  direction => '>')
+        || $self->practice_spell("drain life",   direction => '>')
+        || $self->practice_spell("slow monster", direction => '>')
+        || $self->practice_spell("knock",        direction => '>')
+        || $self->practice_spell("wizard lock",  direction => '>')
 
-        || $self->practice_down("stone to flesh", avoid_items => 1, direction => '>')
-        || $self->practice_down("polymorph",      avoid_items => 1, direction => '>')
-        || $self->practice_down("cancellation",   avoid_items => 1, direction => '>')
-        || $self->practice_down("force bolt",     avoid_items => 1, direction => '>');
+        || $self->practice_spell("stone to flesh", avoid_items => 1, direction => '>')
+        || $self->practice_spell("polymorph",      avoid_items => 1, direction => '>')
+        || $self->practice_spell("cancellation",   avoid_items => 1, direction => '>')
+        || $self->practice_spell("force bolt",     avoid_items => 1, direction => '>');
 }
 
 sub practice_spell {
