@@ -1588,9 +1588,9 @@ sub practice_spells {
         || $self->practice_down("knock",        direction => '>')
         || $self->practice_down("wizard lock",  direction => '>')
 
-        || $self->practice_down("stone to flesh", avoid_items => 1, direction => '>');
-        || $self->practice_down("polymorph",      avoid_items => 1, direction => '>');
-        || $self->practice_down("cancellation",   avoid_items => 1, direction => '>');
+        || $self->practice_down("stone to flesh", avoid_items => 1, direction => '>')
+        || $self->practice_down("polymorph",      avoid_items => 1, direction => '>')
+        || $self->practice_down("cancellation",   avoid_items => 1, direction => '>')
         || $self->practice_down("force bolt",     avoid_items => 1, direction => '>');
 }
 
