@@ -92,6 +92,9 @@ our @behaviors = (qw/
 
     blank_crap
 
+    to_buc
+    buc_id
+
     open_door
     to_door
 
@@ -1745,6 +1748,26 @@ sub to_sac {
                   TAEB->current_level->items;
 
     path_to(sub { any { $self->would_sacrifice($_, 1) } shift->items });
+}
+
+sub to_buc {
+    return if TAEB->current_tile->type eq 'altar';
+
+    return unless TAEB->current_level->has_type('altar');
+    return if all { defined $_->buc } TAEB->inventory_items;
+
+    path_to('altar');
+}
+
+sub buc_id {
+    return unless TAEB->current_tile->type eq 'altar';
+
+    my @items = TAEB->inventory->find(buc => undef);
+    return if !@items;
+
+    return TAEB::Action::Drop->new(
+        items => \@items,
+    );
 }
 
 sub find_adjacent {

@@ -16,3 +16,4 @@ He can:
 * destroy Oracle statues for potential spellbooks
 * practice spells for #enhance
 * make holy water and bless/uncurse beneficial items using it
+* drop items on altars to BUC ID them
