@@ -1430,8 +1430,7 @@ sub to_good_unknown_items {
     my @tiles = TAEB->current_level->tiles_of('unknown_items');
 
     return unless any {
-        my $tile = shift;
-        $tile->has_unknown_items && $is_good_unknown{$tile->glyph}
+        $_->has_unknown_items && $is_good_unknown{$_->glyph}
     } @tiles;
 
     path_to(sub {
